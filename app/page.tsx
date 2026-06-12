@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import type { Trial, TrialVerdict } from "@/lib/types";
-import { TrialCard, type TrialEvaluation } from "@/components/TrialCard";
+import { useRef, useState } from "react";
+import type { PatientProfile, Trial, TrialVerdict } from "@/lib/types";
+import { prefilterTrial, nearestSite } from "@/lib/prefilter";
+import { ResultsView, type MatchResults } from "@/components/ResultsView";
 import {
   EMPTY_FORM,
   PatientForm,
@@ -10,52 +11,156 @@ import {
   type PatientFormState,
 } from "@/components/PatientForm";
 
+// Per-run LLM budget: only the top survivors of the code pre-filter get a
+// full criterion-by-criterion evaluation.
+const MAX_LLM_EVALUATIONS = 8;
+const EVAL_CONCURRENCY = 3;
+
+const emptyResults = (): MatchResults => ({
+  trials: [],
+  verdicts: {},
+  nearMissPaths: {},
+  pendingIds: new Set(),
+  errors: {},
+  unreviewed: [],
+});
+
 export default function Home() {
   const [form, setForm] = useState<PatientFormState>(EMPTY_FORM);
-  const [trials, setTrials] = useState<Trial[] | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "searching" | "evaluating" | "done">("idle");
+  const [results, setResults] = useState<MatchResults | null>(null);
+  const [distanceLabels, setDistanceLabels] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const [evaluations, setEvaluations] = useState<Record<string, TrialEvaluation>>({});
+  const runRef = useRef(0);
 
-  async function search(e: React.FormEvent) {
-    e.preventDefault();
-    const condition = form.condition.trim();
-    if (!condition || loading) return;
-    setLoading(true);
-    setError(null);
-    setTrials(null);
-    setEvaluations({});
-    try {
-      const res = await fetch(`/api/trials?cond=${encodeURIComponent(condition)}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
-      setTrials(data.trials);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed");
-    } finally {
-      setLoading(false);
-    }
+  function update(run: number, mutate: (r: MatchResults) => void) {
+    if (runRef.current !== run) return;
+    setResults((prev) => {
+      const next: MatchResults = prev
+        ? {
+            ...prev,
+            verdicts: { ...prev.verdicts },
+            nearMissPaths: { ...prev.nearMissPaths },
+            pendingIds: new Set(prev.pendingIds),
+            errors: { ...prev.errors },
+          }
+        : emptyResults();
+      mutate(next);
+      return next;
+    });
   }
 
-  async function evaluate(nctId: string) {
-    setEvaluations((prev) => ({ ...prev, [nctId]: { loading: true } }));
+  async function evaluateOne(run: number, trial: Trial, profile: PatientProfile) {
+    update(run, (r) => {
+      r.pendingIds.add(trial.nctId);
+      delete r.errors[trial.nctId];
+    });
     try {
       const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nctId, profile: profileFromFormState(form) }),
+        body: JSON.stringify({ nctId: trial.nctId, profile }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
       const verdict: TrialVerdict = data.verdict;
-      setEvaluations((prev) => ({ ...prev, [nctId]: { loading: false, verdict } }));
+      update(run, (r) => {
+        r.pendingIds.delete(trial.nctId);
+        r.verdicts[trial.nctId] = verdict;
+      });
     } catch (err) {
-      setEvaluations((prev) => ({
-        ...prev,
-        [nctId]: { loading: false, error: err instanceof Error ? err.message : "Failed" },
-      }));
+      const message = err instanceof Error ? err.message : "Evaluation failed";
+      update(run, (r) => {
+        r.pendingIds.delete(trial.nctId);
+        r.errors[trial.nctId] = message;
+      });
+      if (message.includes("ANTHROPIC_API_KEY")) throw err; // abort the pool — every call will fail
     }
   }
+
+  async function findTrials(e: React.FormEvent) {
+    e.preventDefault();
+    const condition = form.condition.trim();
+    if (!condition || phase === "searching" || phase === "evaluating") return;
+    const run = ++runRef.current;
+    const profile = profileFromFormState(form);
+
+    setPhase("searching");
+    setError(null);
+    setResults(null);
+
+    let trials: Trial[];
+    try {
+      const res = await fetch(`/api/trials?cond=${encodeURIComponent(condition)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      trials = data.trials;
+    } catch (err) {
+      if (runRef.current === run) {
+        setError(err instanceof Error ? err.message : "Search failed");
+        setPhase("idle");
+      }
+      return;
+    }
+    if (runRef.current !== run) return;
+
+    // Code pre-filter: structured fields rule trials out before any LLM call.
+    const verdicts: Record<string, TrialVerdict> = {};
+    const survivors: Trial[] = [];
+    const labels: Record<string, string> = {};
+    for (const t of trials) {
+      const near = nearestSite(t, profile);
+      if (near) labels[t.nctId] = `${Math.round(near.km).toLocaleString()} km`;
+      const pre = prefilterTrial(t, profile);
+      if (pre) verdicts[t.nctId] = pre;
+      else survivors.push(t);
+    }
+    const toEvaluate = survivors.slice(0, MAX_LLM_EVALUATIONS);
+    const unreviewed = survivors.slice(MAX_LLM_EVALUATIONS);
+
+    setDistanceLabels(labels);
+    setResults({
+      trials: [...toEvaluate, ...trials.filter((t) => verdicts[t.nctId])],
+      verdicts,
+      nearMissPaths: {},
+      pendingIds: new Set(),
+      errors: {},
+      unreviewed,
+    });
+    setPhase("evaluating");
+
+    // Bounded-concurrency evaluation pool; a missing-API-key error aborts the run.
+    const queue = [...toEvaluate];
+    let aborted = false;
+    const workers = Array.from({ length: EVAL_CONCURRENCY }, async () => {
+      while (queue.length > 0 && !aborted && runRef.current === run) {
+        const trial = queue.shift()!;
+        try {
+          await evaluateOne(run, trial, profile);
+        } catch {
+          aborted = true;
+          if (runRef.current === run) {
+            setError(
+              "Claude is not configured: add ANTHROPIC_API_KEY to .env.local to enable eligibility reasoning. Search and pre-filtering still work.",
+            );
+          }
+        }
+      }
+    });
+    await Promise.all(workers);
+    if (runRef.current === run) setPhase("done");
+  }
+
+  function retry(nctId: string) {
+    const trial = results?.trials.find((t) => t.nctId === nctId);
+    if (!trial) return;
+    void evaluateOne(runRef.current, trial, profileFromFormState(form)).catch(() => {});
+  }
+
+  const busy = phase === "searching" || phase === "evaluating";
+  const evaluatedCount = results
+    ? Object.keys(results.verdicts).length + Object.keys(results.errors).length
+    : 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -73,42 +178,38 @@ export default function Home() {
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-6 px-6 py-8">
         <PatientForm state={form} onChange={setForm} />
 
-        <form onSubmit={search} className="flex justify-end">
+        <form onSubmit={findTrials} className="flex items-center justify-end gap-3">
+          {phase === "evaluating" && results && (
+            <p className="text-xs text-slate-500">
+              Evaluating eligibility… {Math.min(evaluatedCount, results.trials.length)} done
+            </p>
+          )}
           <button
             type="submit"
-            disabled={loading || !form.condition.trim()}
+            disabled={busy || !form.condition.trim()}
             className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Searching…" : "Find trials"}
+            {phase === "searching"
+              ? "Searching…"
+              : phase === "evaluating"
+                ? "Matching…"
+                : "Find trials"}
           </button>
         </form>
 
-        <div>
-          {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-          {loading && <p className="text-sm text-slate-500">Querying ClinicalTrials.gov…</p>}
-          {trials && (
-            <>
-              <p className="mb-4 text-sm text-slate-500">
-                {trials.length} recruiting {trials.length === 1 ? "trial" : "trials"} found
-              </p>
-              <ul className="space-y-4">
-                {trials.map((t) => (
-                  <li key={t.nctId}>
-                    <TrialCard
-                      trial={t}
-                      evaluation={evaluations[t.nctId]}
-                      onEvaluate={() => evaluate(t.nctId)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
+        {error && (
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {error}
+          </p>
+        )}
+
+        {phase === "searching" && (
+          <p className="text-sm text-slate-500">Querying ClinicalTrials.gov…</p>
+        )}
+
+        {results && (
+          <ResultsView results={results} distanceLabels={distanceLabels} onRetry={retry} />
+        )}
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
