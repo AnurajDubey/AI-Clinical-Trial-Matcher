@@ -1,25 +1,13 @@
-import type { PatientProfile } from "./types";
-
-// Synthetic example patients — no real PHI. The trials are real; these are not.
-export const EXAMPLE_PATIENTS: Record<string, PatientProfile> = {
-  Maria: {
-    condition: "metastatic HER2-positive breast cancer",
-    age: 54,
-    sex: "FEMALE",
-    location: { city: "San Diego, CA", lat: 32.7157, lon: -117.1611 },
-    stage: "IV (metastatic)",
-    biomarkers: { HER2: "positive", ER: "positive", PR: "negative" },
-    priorTreatments: ["trastuzumab", "paclitaxel"],
-    comorbidities: ["controlled hypertension"],
+// Synthetic example intakes — no real PHI. The trials are real; these are not.
+// Maria's message deliberately omits receptor status so the agent's first
+// info-gain question (differentiator #2) has something real to ask.
+export const EXAMPLE_INTAKES: { name: string; text: string }[] = [
+  {
+    name: "Maria",
+    text: "I'm looking for trials for my mom Maria. She's 54, lives in San Diego, and has metastatic breast cancer. She's already been treated with trastuzumab and paclitaxel.",
   },
-  James: {
-    condition: "Parkinson's disease",
-    age: 67,
-    sex: "MALE",
-    location: { city: "Billings, MT", lat: 45.7833, lon: -108.5007 },
-    stage: "moderate, Hoehn & Yahr stage 2",
-    biomarkers: {},
-    priorTreatments: ["levodopa/carbidopa (current)"],
-    comorbidities: ["type 2 diabetes"],
+  {
+    name: "James",
+    text: "My dad James is 67, has Parkinson's disease, and takes levodopa. We live outside Billings, Montana — is anything within reach for him?",
   },
-};
+];

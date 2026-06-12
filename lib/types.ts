@@ -79,6 +79,6 @@ export interface AgentState {
   candidates: Trial[]; // trials pulled from CT.gov
   verdicts: Record<string, TrialVerdict>; // keyed by nctId
   nearMissPaths: Record<string, string>; // nctId -> path to eligibility
-  history: unknown[]; // running transcript / tool log
+  history: { tool: string; detail: string }[]; // running tool log
   done: boolean;
 }
