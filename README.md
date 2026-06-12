@@ -1,16 +1,23 @@
 # Clinical Trial Navigator
 
-An agentic web app that helps a patient find clinical trials they might qualify
-for — and that reasons like a navigator, not a search box.
+## Purpose
 
-Describe the patient in plain language. The agent interviews you (asking only
-the questions that change the answer), searches the **live ClinicalTrials.gov
-API**, reasons through each trial's eligibility criteria one by one, and sorts
-trials into three buckets — **Likely qualifies / Near miss / Likely excluded**
-— each with plain-language reasons. For near misses it goes one step further
-and works out the *path to eligibility*: "eligible ~6 weeks after stopping X",
-"get this biomarker test — if positive, this trial opens up", "excluded from
-Cohort A but Cohort C fits".
+ClinicalTrials.gov is a keyword index over dense, jargon-heavy eligibility
+criteria. A patient or caregiver can search it, but they can't easily tell
+*which* trials they'd actually qualify for, which ones are close, or what
+would have to change to get in.
+
+This app is an agent that does that reading for you. Describe the patient in
+plain language; the agent interviews you — asking only the questions that
+would actually change the answer — searches the **live ClinicalTrials.gov
+API**, and reasons through each trial's eligibility criteria one by one,
+sorting results into **Likely qualifies / Near miss / Likely excluded** with
+plain-language reasons. For near misses it goes one step further and works
+out the *path to eligibility*: "eligible ~6 weeks after stopping X", "get this
+biomarker test — if positive, this trial opens up", "excluded from Cohort A
+but Cohort C fits". That gap reasoning is the part that turns a search box
+into a navigator.
+
 
 > Decision-support only — not medical advice. Trial sites confirm final
 > eligibility. All patients in examples and recordings are synthetic; the
@@ -20,13 +27,25 @@ Cohort A but Cohort C fits".
 
 ```bash
 npm install
-cp .env.local.example .env.local   # add your ANTHROPIC_API_KEY
 npm run dev                        # http://localhost:3000
 ```
 
-ClinicalTrials.gov needs **no key** (free, open API). Without an Anthropic key
-the app still searches and pre-filters; the eligibility reasoning, intake
-conversation, and gap analysis need the key.
+There are two ways to see it work:
+
+- **Live mode** — the real chat-driven navigator. Needs an Anthropic key:
+  *every* turn, starting with your first message, calls Claude (to extract
+  the patient profile and to decide the agent's next move).
+
+  ```bash
+  cp .env.local.example .env.local   # add your ANTHROPIC_API_KEY
+  ```
+
+- **Replay mode** — re-emits a recorded session through the identical UI and
+  event stream, at $0 and with no key. Requires at least one recording in
+  `public/sessions/`; the committed manifest starts empty. See "Recording &
+  replaying sessions" below to create one.
+
+ClinicalTrials.gov needs **no key** either way (free, open API).
 
 ## How it works
 
@@ -40,8 +59,7 @@ UI (chat | live reasoning trace | bucketed results)
 ```
 
 The **controller loop** ([lib/agent/controller.ts](lib/agent/controller.ts)) is
-a custom loop on the Anthropic SDK's native tool use — no agent framework. Each
-turn, the model chooses exactly one tool; the loop dispatches it, records the
+a custom loop using the Anthropic SDK's native tool use — no agent framework like LangGraph or CrewAI. Each turn, the model chooses exactly one tool; the loop dispatches it, records the
 observation into state, and repeats:
 
 | Tool | What it does |
@@ -59,6 +77,11 @@ Four files explain the whole agent:
 3. **One reasoning step** — [lib/agent/evaluateTrial.ts](lib/agent/evaluateTrial.ts) (criteria split → structured verdicts)
 4. **The Runner seam** — [lib/runner/live.ts](lib/runner/live.ts) vs [lib/runner/replay.ts](lib/runner/replay.ts) (same event stream, so the UI can't tell live from replay)
 
+`/api/agent` is the only route the UI calls. `/api/trials`, `/api/evaluate`,
+and `/api/gap` are standalone routes left over from earlier build slices —
+useful for poking at one piece in isolation (e.g. `evaluateTrial` on a single
+trial via curl) without running the full agent loop.
+
 ## Recording & replaying sessions
 
 The public demo replays **recorded sessions** — deterministic, free, and
@@ -66,16 +89,22 @@ nothing to abuse, since no key is in the wild.
 
 ```bash
 npm run record -- --scenario=maria   # scripted persona (scripts/scenarios/)
+npm run record -- --scenario=james   # the other scripted persona
 npm run record                       # interactive — you type the patient side
 ```
 
-Recordings land in `public/sessions/` and register themselves in the manifest;
-commit them and they appear under "Watch a recorded session" in the UI.
+Each run needs `ANTHROPIC_API_KEY` set (it drives the real controller loop).
+Recordings land in `public/sessions/` and register themselves in
+`public/sessions/index.json`; commit them and they appear under "Watch a
+recorded session" in the UI. That manifest is currently empty — no sessions
+have been recorded yet.
 
 ## Deploying
 
-Standard Next.js deploy (e.g. Vercel). Replay works with zero configuration;
-set `ANTHROPIC_API_KEY` in the environment to enable live mode. Long runs use
+Standard Next.js deploy (e.g. Vercel). Before deploying a key-less public
+demo, commit at least one recording — with an empty manifest and no key, the
+start screen has nothing to replay and live mode fails on the first message.
+Set `ANTHROPIC_API_KEY` in the environment to enable live mode. Long runs use
 streaming responses (`maxDuration = 300` on the agent route).
 
 ## Stack
