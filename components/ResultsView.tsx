@@ -7,6 +7,7 @@ export interface MatchResults {
   verdicts: Record<string, TrialVerdict>;
   nearMissPaths: Record<string, string>;
   pendingIds: Set<string>;
+  gapPendingIds: Set<string>;
   errors: Record<string, string>;
   unreviewed: Trial[]; // survivors beyond the per-run LLM budget
 }
@@ -52,6 +53,7 @@ export function ResultsView({
         trial={t}
         verdict={results.verdicts[t.nctId]}
         gapPath={results.nearMissPaths[t.nctId]}
+        gapPending={results.gapPendingIds.has(t.nctId)}
         pending={results.pendingIds.has(t.nctId)}
         error={results.errors[t.nctId]}
         onRetry={() => onRetry(t.nctId)}

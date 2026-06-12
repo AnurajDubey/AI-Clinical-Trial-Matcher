@@ -33,6 +33,7 @@ export function TrialCard({
   trial,
   verdict,
   gapPath,
+  gapPending,
   pending,
   error,
   onRetry,
@@ -41,6 +42,7 @@ export function TrialCard({
   trial: Trial;
   verdict?: TrialVerdict;
   gapPath?: string;
+  gapPending?: boolean;
   pending?: boolean;
   error?: string;
   onRetry?: () => void;
@@ -112,6 +114,12 @@ export function TrialCard({
               <p className="font-semibold">Path to eligibility</p>
               <p className="mt-1 whitespace-pre-line">{gapPath}</p>
             </div>
+          )}
+          {gapPending && (
+            <p className="text-xs text-slate-500">
+              <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent align-middle" />
+              Working out the path to eligibility…
+            </p>
           )}
 
           <details className="group">

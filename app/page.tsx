@@ -21,6 +21,7 @@ const emptyResults = (): MatchResults => ({
   verdicts: {},
   nearMissPaths: {},
   pendingIds: new Set(),
+  gapPendingIds: new Set(),
   errors: {},
   unreviewed: [],
 });
@@ -42,6 +43,7 @@ export default function Home() {
             verdicts: { ...prev.verdicts },
             nearMissPaths: { ...prev.nearMissPaths },
             pendingIds: new Set(prev.pendingIds),
+            gapPendingIds: new Set(prev.gapPendingIds),
             errors: { ...prev.errors },
           }
         : emptyResults();
@@ -68,6 +70,10 @@ export default function Home() {
         r.pendingIds.delete(trial.nctId);
         r.verdicts[trial.nctId] = verdict;
       });
+      // Differentiator #1: near-misses get counterfactual gap reasoning.
+      if (verdict.status === "NEAR_MISS") {
+        await computeGapFor(run, trial, profile, verdict);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Evaluation failed";
       update(run, (r) => {
@@ -75,6 +81,32 @@ export default function Home() {
         r.errors[trial.nctId] = message;
       });
       if (message.includes("ANTHROPIC_API_KEY")) throw err; // abort the pool — every call will fail
+    }
+  }
+
+  async function computeGapFor(
+    run: number,
+    trial: Trial,
+    profile: PatientProfile,
+    verdict: TrialVerdict,
+  ) {
+    update(run, (r) => r.gapPendingIds.add(trial.nctId));
+    try {
+      const res = await fetch("/api/gap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nctId: trial.nctId, profile, verdict }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      update(run, (r) => {
+        r.gapPendingIds.delete(trial.nctId);
+        r.nearMissPaths[trial.nctId] = data.path;
+      });
+    } catch (err) {
+      // Gap analysis is additive — the verdict still stands without it.
+      console.error(`Gap analysis failed for ${trial.nctId}`, err);
+      update(run, (r) => r.gapPendingIds.delete(trial.nctId));
     }
   }
 
@@ -124,6 +156,7 @@ export default function Home() {
       verdicts,
       nearMissPaths: {},
       pendingIds: new Set(),
+      gapPendingIds: new Set(),
       errors: {},
       unreviewed,
     });
