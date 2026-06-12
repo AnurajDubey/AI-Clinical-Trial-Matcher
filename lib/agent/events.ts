@@ -17,6 +17,7 @@ export interface Continuation {
 }
 
 export type AgentEvent =
+  | { type: "userMessage"; text: string } // recorded sessions only — the patient's side
   | { type: "thinking"; delta: string }
   | { type: "narration"; delta: string }
   | { type: "tool"; name: string; detail: string }
@@ -30,7 +31,7 @@ export type AgentEvent =
   | { type: "evaluating"; nctId: string }
   | { type: "verdict"; nctId: string; verdict: TrialVerdict }
   | { type: "gap"; nctId: string; path: string }
-  | { type: "ask"; question: string; continuation: Continuation }
+  | { type: "ask"; question: string; continuation?: Continuation } // continuation absent in recordings
   | { type: "final"; message: string }
   | { type: "error"; message: string }
   | { type: "done" };

@@ -1,0 +1,13 @@
+{
+  "slug": "james",
+  "name": "James — Parkinson's disease, rural Montana",
+  "description": "Distance is a real constraint; shows a levodopa timing near-miss with a concrete date and what telehealth or travel could open up.",
+  "firstMessage": "My dad James is 67, has Parkinson's disease, and takes levodopa. We live outside Billings, Montana — is anything within reach for him?",
+  "answers": [
+    "He was diagnosed about six years ago. His main symptoms are tremor and slowness, and lately the levodopa seems to wear off between doses.",
+    "He takes carbidopa-levodopa 25/100, two tablets three times a day. He hasn't had deep brain stimulation or any infusion therapies.",
+    "He's otherwise pretty healthy — type 2 diabetes controlled with metformin, and no memory problems.",
+    "He could manage a few hours by car. Flying is hard for him, so somewhere in Montana or a neighboring state would be best.",
+    "Yes, he'd be open to telehealth visits if a study allows them."
+  ]
+}

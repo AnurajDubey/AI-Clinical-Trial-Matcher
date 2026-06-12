@@ -1,0 +1,14 @@
+{
+  "slug": "maria",
+  "name": "Maria — metastatic breast cancer, San Diego",
+  "description": "Intake pins down receptor status, then finds qualifying trials plus near-misses with concrete paths (washout windows, a missing test, cohort fit).",
+  "firstMessage": "I'm looking for trials for my mom Maria. She's 54, lives in San Diego, and has metastatic breast cancer. She's already been treated with trastuzumab and paclitaxel.",
+  "answers": [
+    "Her cancer is HER2-positive. The last biopsy also showed ER-positive and PR-negative.",
+    "She finished her last paclitaxel infusion about two weeks ago and is still on trastuzumab. Her last scan showed no brain metastases.",
+    "She had an echocardiogram about a month ago and it was normal — ejection fraction around 60%. Her overall condition is good, she's up and about most of the day.",
+    "She hasn't had any genomic or biomarker testing beyond the receptor status — no PIK3CA or PD-L1 testing that we know of.",
+    "She can travel anywhere in Southern California for visits. No other major health problems besides controlled high blood pressure.",
+    "No, she hasn't received any other HER2-targeted drugs — just the trastuzumab with paclitaxel as her first treatment."
+  ]
+}

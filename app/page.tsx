@@ -1,11 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PatientProfile } from "@/lib/types";
-import type { AgentEvent, Continuation } from "@/lib/agent/events";
+import type { AgentEvent } from "@/lib/agent/events";
+import { LiveRunner } from "@/lib/runner/live";
+import {
+  fetchSession,
+  fetchSessionManifest,
+  replaySession,
+  type ReplayHandle,
+  type SessionManifestEntry,
+} from "@/lib/runner/replay";
 import { ChatPanel, type ChatMessage } from "@/components/ChatPanel";
 import { TracePanel, type TraceItem } from "@/components/TracePanel";
 import { ProfileCard } from "@/components/ProfileCard";
+import { ReplayPicker } from "@/components/ReplayPicker";
 import { ResultsView, type MatchResults } from "@/components/ResultsView";
 
 const emptyResults = (): MatchResults => ({
@@ -22,6 +31,7 @@ type Mode = "start" | "running" | "awaiting" | "done" | "error";
 
 export default function Home() {
   const [mode, setMode] = useState<Mode>("start");
+  const [replaying, setReplaying] = useState(false);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [trace, setTrace] = useState<TraceItem[]>([]);
   const [profile, setProfile] = useState<PatientProfile>({});
@@ -29,7 +39,13 @@ export default function Home() {
   const [results, setResults] = useState<MatchResults | null>(null);
   const [distanceLabels, setDistanceLabels] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const continuationRef = useRef<Continuation | null>(null);
+  const [sessions, setSessions] = useState<SessionManifestEntry[]>([]);
+  const liveRef = useRef<LiveRunner | null>(null);
+  const replayRef = useRef<ReplayHandle | null>(null);
+
+  useEffect(() => {
+    void fetchSessionManifest().then(setSessions);
+  }, []);
 
   function appendTrace(kind: TraceItem["kind"], text: string) {
     setTrace((prev) => {
@@ -60,8 +76,13 @@ export default function Home() {
     });
   }
 
+  // Both runners emit the same events — the UI can't tell live from replay.
   function handleEvent(event: AgentEvent) {
     switch (event.type) {
+      case "userMessage":
+        setChat((prev) => [...prev, { role: "user", text: event.text }]);
+        setMode("running");
+        break;
       case "thinking":
         appendTrace("thinking", event.delta);
         break;
@@ -99,7 +120,6 @@ export default function Home() {
         });
         break;
       case "ask":
-        continuationRef.current = event.continuation;
         setChat((prev) => [...prev, { role: "agent", text: event.question }]);
         setMode("awaiting");
         break;
@@ -117,59 +137,37 @@ export default function Home() {
     }
   }
 
-  async function consumeStream(res: Response) {
-    if (!res.ok || !res.body) {
-      let message = `HTTP ${res.status}`;
-      try {
-        const data = await res.json();
-        message = data.error ?? message;
-      } catch {
-        // not JSON — keep the status line
-      }
-      throw new Error(message);
-    }
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const frames = buffer.split("\n\n");
-      buffer = frames.pop() ?? "";
-      for (const frame of frames) {
-        const line = frame.trim();
-        if (!line.startsWith("data: ")) continue;
-        handleEvent(JSON.parse(line.slice(6)) as AgentEvent);
-      }
+  function send(text: string) {
+    setError(null);
+    setChat((prev) => [...prev, { role: "user", text }]);
+    if (mode === "start") {
+      liveRef.current = new LiveRunner(handleEvent);
+      setMode("running");
+      void liveRef.current.start(text);
+    } else if (mode === "awaiting" && liveRef.current) {
+      setMode("running");
+      void liveRef.current.answer(text);
     }
   }
 
-  async function send(text: string) {
-    const isStart = mode === "start";
-    setChat((prev) => [...prev, { role: "user", text }]);
-    setMode("running");
-    setError(null);
-
-    const payload = isStart
-      ? { start: { text } }
-      : { resume: { continuation: continuationRef.current, answer: text } };
-    continuationRef.current = null;
-
+  async function playSession(entry: SessionManifestEntry) {
+    reset();
     try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      await consumeStream(res);
+      const session = await fetchSession(entry.file);
+      setReplaying(true);
+      setMode("running");
+      replayRef.current = replaySession(session, handleEvent);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Agent run failed");
+      setError(err instanceof Error ? err.message : "Could not load session");
       setMode("error");
     }
   }
 
   function reset() {
+    replayRef.current?.stop();
+    replayRef.current = null;
+    liveRef.current = null;
+    setReplaying(false);
     setMode("start");
     setChat([]);
     setTrace([]);
@@ -178,10 +176,9 @@ export default function Home() {
     setResults(null);
     setDistanceLabels({});
     setError(null);
-    continuationRef.current = null;
   }
 
-  const canSend = mode === "start" || mode === "awaiting";
+  const canSend = !replaying && (mode === "start" || mode === "awaiting");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -214,12 +211,23 @@ export default function Home() {
               messages={chat}
               onSend={send}
               canSend={canSend}
-              running={mode === "running"}
+              running={mode === "running" && !replaying}
             />
             <ProfileCard profile={profile} unknowns={unknowns} />
+            {mode === "start" && (
+              <ReplayPicker sessions={sessions} onPlay={playSession} disabled={false} />
+            )}
           </div>
 
           <div className="min-w-0 space-y-4">
+            {replaying && (
+              <p className="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2.5 text-xs text-violet-800">
+                Replaying a recorded session — deterministic, no live API calls.{" "}
+                <button type="button" onClick={reset} className="font-semibold underline">
+                  Stop
+                </button>
+              </p>
+            )}
             {error && (
               <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 {error}
@@ -227,11 +235,7 @@ export default function Home() {
             )}
             <TracePanel items={trace} live={mode === "running"} />
             {results && (
-              <ResultsView
-                results={results}
-                distanceLabels={distanceLabels}
-                onRetry={() => {}}
-              />
+              <ResultsView results={results} distanceLabels={distanceLabels} onRetry={() => {}} />
             )}
             {!results && mode === "start" && (
               <div className="rounded-xl border border-dashed border-slate-200 px-6 py-16 text-center">
