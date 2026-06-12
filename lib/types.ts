@@ -62,12 +62,14 @@ export interface Trial {
 
 export interface CriterionVerdict {
   text: string;
-  verdict: Verdict;
+  kind: "INCLUSION" | "EXCLUSION";
+  verdict: Verdict; // always relative to eligibility: MET is good for the patient
   reason: string;
 }
 
 export interface TrialVerdict {
   status: TrialBucket;
+  summary: string;
   criteria: CriterionVerdict[];
 }
 

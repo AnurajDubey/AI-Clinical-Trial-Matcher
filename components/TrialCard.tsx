@@ -1,4 +1,11 @@
-import type { Trial } from "@/lib/types";
+import type { Trial, TrialVerdict } from "@/lib/types";
+import { CriteriaList } from "./CriteriaList";
+
+export interface TrialEvaluation {
+  loading: boolean;
+  error?: string;
+  verdict?: TrialVerdict;
+}
 
 function formatPhase(phases: string[]): string | null {
   if (phases.length === 0) return null;
@@ -28,7 +35,15 @@ function formatSex(sex?: string): string {
   return "All sexes";
 }
 
-export function TrialCard({ trial }: { trial: Trial }) {
+export function TrialCard({
+  trial,
+  evaluation,
+  onEvaluate,
+}: {
+  trial: Trial;
+  evaluation?: TrialEvaluation;
+  onEvaluate?: () => void;
+}) {
   const phase = formatPhase(trial.phases);
   const usLocations = trial.locations.filter((l) => l.country === "United States");
 
@@ -66,6 +81,35 @@ export function TrialCard({ trial }: { trial: Trial }) {
 
       {trial.conditions.length > 0 && (
         <p className="mt-2 truncate text-xs text-slate-500">{trial.conditions.join(" · ")}</p>
+      )}
+
+      {onEvaluate && (
+        <div className="mt-4 border-t border-slate-100 pt-3">
+          {!evaluation && (
+            <button
+              type="button"
+              onClick={onEvaluate}
+              className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100"
+            >
+              Evaluate eligibility
+            </button>
+          )}
+          {evaluation?.loading && (
+            <p className="text-xs text-slate-500">
+              <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent align-middle" />
+              Reasoning over eligibility criteria…
+            </p>
+          )}
+          {evaluation?.error && (
+            <p className="text-xs text-red-600">
+              {evaluation.error}{" "}
+              <button type="button" onClick={onEvaluate} className="font-medium underline">
+                Retry
+              </button>
+            </p>
+          )}
+          {evaluation?.verdict && <CriteriaList verdict={evaluation.verdict} />}
+        </div>
       )}
     </div>
   );

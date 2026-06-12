@@ -1,23 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import type { Trial } from "@/lib/types";
-import { TrialCard } from "@/components/TrialCard";
+import type { Trial, TrialVerdict } from "@/lib/types";
+import { TrialCard, type TrialEvaluation } from "@/components/TrialCard";
+import {
+  EMPTY_FORM,
+  PatientForm,
+  profileFromFormState,
+  type PatientFormState,
+} from "@/components/PatientForm";
 
 export default function Home() {
-  const [condition, setCondition] = useState("");
+  const [form, setForm] = useState<PatientFormState>(EMPTY_FORM);
   const [trials, setTrials] = useState<Trial[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [evaluations, setEvaluations] = useState<Record<string, TrialEvaluation>>({});
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
-    if (!condition.trim() || loading) return;
+    const condition = form.condition.trim();
+    if (!condition || loading) return;
     setLoading(true);
     setError(null);
     setTrials(null);
+    setEvaluations({});
     try {
-      const res = await fetch(`/api/trials?cond=${encodeURIComponent(condition.trim())}`);
+      const res = await fetch(`/api/trials?cond=${encodeURIComponent(condition)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
       setTrials(data.trials);
@@ -25,6 +34,26 @@ export default function Home() {
       setError(err instanceof Error ? err.message : "Search failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function evaluate(nctId: string) {
+    setEvaluations((prev) => ({ ...prev, [nctId]: { loading: true } }));
+    try {
+      const res = await fetch("/api/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nctId, profile: profileFromFormState(form) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      const verdict: TrialVerdict = data.verdict;
+      setEvaluations((prev) => ({ ...prev, [nctId]: { loading: false, verdict } }));
+    } catch (err) {
+      setEvaluations((prev) => ({
+        ...prev,
+        [nctId]: { loading: false, error: err instanceof Error ? err.message : "Failed" },
+      }));
     }
   }
 
@@ -41,32 +70,26 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-8">
-        <form onSubmit={search} className="flex gap-3">
-          <input
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            placeholder="Condition, e.g. metastatic breast cancer"
-            className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
-          />
+      <main className="mx-auto w-full max-w-4xl flex-1 space-y-6 px-6 py-8">
+        <PatientForm state={form} onChange={setForm} />
+
+        <form onSubmit={search} className="flex justify-end">
           <button
             type="submit"
-            disabled={loading || !condition.trim()}
+            disabled={loading || !form.condition.trim()}
             className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Searching…" : "Search trials"}
+            {loading ? "Searching…" : "Find trials"}
           </button>
         </form>
 
-        <div className="mt-8">
+        <div>
           {error && (
             <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </p>
           )}
-          {loading && (
-            <p className="text-sm text-slate-500">Querying ClinicalTrials.gov…</p>
-          )}
+          {loading && <p className="text-sm text-slate-500">Querying ClinicalTrials.gov…</p>}
           {trials && (
             <>
               <p className="mb-4 text-sm text-slate-500">
@@ -75,7 +98,11 @@ export default function Home() {
               <ul className="space-y-4">
                 {trials.map((t) => (
                   <li key={t.nctId}>
-                    <TrialCard trial={t} />
+                    <TrialCard
+                      trial={t}
+                      evaluation={evaluations[t.nctId]}
+                      onEvaluate={() => evaluate(t.nctId)}
+                    />
                   </li>
                 ))}
               </ul>
