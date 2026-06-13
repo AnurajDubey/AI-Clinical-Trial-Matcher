@@ -183,7 +183,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex w-full max-w-6xl items-baseline justify-between px-6 py-4">
+        <div className="mx-auto flex w-full max-w-[1600px] items-baseline justify-between px-6 py-4">
           <div className="flex items-baseline gap-3">
             <h1 className="text-lg font-semibold tracking-tight text-slate-900">
               Clinical Trial Navigator
@@ -204,21 +204,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px,1fr]">
-          <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-            <ChatPanel
-              messages={chat}
-              onSend={send}
-              canSend={canSend}
-              running={mode === "running" && !replaying}
-            />
-            <ProfileCard profile={profile} unknowns={unknowns} />
-            {mode === "start" && (
-              <ReplayPicker sessions={sessions} onPlay={playSession} disabled={false} />
-            )}
-          </div>
-
+      <main className="mx-auto w-full max-w-[1600px] flex-1 px-6 py-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px_1fr]">
           <div className="min-w-0 space-y-4">
             {replaying && (
               <p className="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2.5 text-xs text-violet-800">
@@ -250,11 +237,24 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          <div className="min-w-0 space-y-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:self-start lg:overflow-y-auto">
+            <ChatPanel
+              messages={chat}
+              onSend={send}
+              canSend={canSend}
+              running={mode === "running" && !replaying}
+            />
+            <ProfileCard profile={profile} unknowns={unknowns} />
+            {mode === "start" && (
+              <ReplayPicker sessions={sessions} onPlay={playSession} disabled={false} />
+            )}
+          </div>
         </div>
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
-        <p className="mx-auto w-full max-w-6xl px-6 py-3 text-xs text-slate-400">
+        <p className="mx-auto w-full max-w-[1600px] px-6 py-3 text-xs text-slate-400">
           Decision-support only — not medical advice. Trial eligibility is always confirmed by
           the trial site and your care team.
         </p>

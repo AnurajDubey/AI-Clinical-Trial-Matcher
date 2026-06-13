@@ -17,8 +17,10 @@ export function TracePanel({ items, live }: { items: TraceItem[]; live: boolean 
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [items]);
+    // Only pin to the latest line while streaming; once settled the trace
+    // expands inline and scrolls with the page instead of within itself.
+    if (live) scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+  }, [items, live]);
 
   if (items.length === 0 && !live) return null;
 
@@ -30,7 +32,10 @@ export function TracePanel({ items, live }: { items: TraceItem[]; live: boolean 
           {live ? "live — the agent decides each move" : `${items.length} steps`}
         </span>
       </summary>
-      <div ref={scrollRef} className="max-h-64 space-y-2 overflow-y-auto px-4 py-3">
+      <div
+        ref={scrollRef}
+        className={`space-y-2 px-4 py-3 ${live ? "max-h-64 overflow-y-auto" : ""}`}
+      >
         {items.map((item, i) => {
           const style = KIND_STYLES[item.kind];
           return (
