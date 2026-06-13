@@ -95,7 +95,7 @@ export function TrialCard({
           href={`https://clinicaltrials.gov/study/${trial.nctId}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex shrink-0 items-center gap-1 rounded-md bg-slate-50 px-2 py-1 font-mono text-xs text-sky-600 transition hover:bg-sky-50 hover:text-sky-700"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md bg-slate-50 px-2 py-1 font-mono text-xs text-teal-600 transition hover:bg-teal-50 hover:text-teal-700"
         >
           {trial.nctId}
           <svg
@@ -133,7 +133,7 @@ export function TrialCard({
 
       {pending && (
         <p className="mt-3 flex items-center text-xs text-slate-500">
-          <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent align-middle" />
+          <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-teal-500 border-t-transparent align-middle" />
           Reasoning over eligibility criteria…
         </p>
       )}
@@ -164,7 +164,7 @@ export function TrialCard({
           </div>
 
           {gapPath && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 to-cyan-50 px-4 py-3 text-sm text-sky-900">
+            <div className="flex items-start gap-2.5 rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-emerald-50 px-4 py-3 text-sm text-teal-900">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -172,7 +172,7 @@ export function TrialCard({
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="mt-0.5 h-4 w-4 shrink-0 text-sky-600"
+                className="mt-0.5 h-4 w-4 shrink-0 text-teal-600"
               >
                 <circle cx="6" cy="19" r="3" />
                 <circle cx="18" cy="5" r="3" />
@@ -186,7 +186,7 @@ export function TrialCard({
           )}
           {gapPending && (
             <p className="flex items-center text-xs text-slate-500">
-              <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent align-middle" />
+              <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-teal-500 border-t-transparent align-middle" />
               Working out the path to eligibility…
             </p>
           )}

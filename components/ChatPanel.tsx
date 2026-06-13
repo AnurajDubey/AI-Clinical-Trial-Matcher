@@ -37,7 +37,7 @@ export function ChatPanel({
   return (
     <div className="flex h-[36rem] flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-card">
       <div className="flex items-center gap-2.5 border-b border-slate-100 bg-gradient-to-b from-white to-slate-50/60 px-4 py-3">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white shadow-glow">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-glow">
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
             <path d="M12 2.5l1.9 5.1 5.1 1.9-5.1 1.9L12 16.5l-1.9-5.1L5 9.5l5.1-1.9z" />
           </svg>
@@ -59,7 +59,7 @@ export function ChatPanel({
                 key={ex.name}
                 type="button"
                 onClick={() => canSend && onSend(ex.text)}
-                className="group block w-full rounded-xl border border-slate-200 bg-white p-3 text-left transition hover:-translate-y-0.5 hover:border-sky-300 hover:bg-sky-50/50 hover:shadow-sm"
+                className="group block w-full rounded-xl border border-slate-200 bg-white p-3 text-left transition hover:-translate-y-0.5 hover:border-teal-300 hover:bg-teal-50/50 hover:shadow-sm"
               >
                 <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
                   <svg
@@ -69,7 +69,7 @@ export function ChatPanel({
                     strokeWidth={2}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-3.5 w-3.5 text-sky-500"
+                    className="h-3.5 w-3.5 text-teal-500"
                   >
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
@@ -87,7 +87,7 @@ export function ChatPanel({
             <div
               className={
                 m.role === "user"
-                  ? "max-w-[85%] rounded-2xl rounded-br-md bg-gradient-to-br from-sky-500 to-sky-600 px-3.5 py-2 text-sm text-white shadow-sm"
+                  ? "max-w-[85%] rounded-2xl rounded-br-md bg-gradient-to-br from-teal-500 to-teal-600 px-3.5 py-2 text-sm text-white shadow-sm"
                   : "max-w-[85%] whitespace-pre-line rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-700 shadow-sm"
               }
             >
@@ -100,9 +100,9 @@ export function ChatPanel({
           <div className="flex justify-start">
             <div className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-400 shadow-sm">
               <span className="flex gap-1">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400 [animation-delay:-0.3s]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400 [animation-delay:-0.15s]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-400 [animation-delay:-0.3s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-400 [animation-delay:-0.15s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-400" />
               </span>
               navigating…
             </div>
@@ -117,13 +117,13 @@ export function ChatPanel({
             onChange={(e) => setDraft(e.target.value)}
             placeholder={canSend ? "Type your message…" : "Waiting for the navigator…"}
             disabled={!canSend}
-            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100 disabled:opacity-60"
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-teal-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-teal-100 disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={!canSend || !draft.trim()}
             aria-label="Send message"
-            className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 text-white shadow-sm transition hover:from-sky-600 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-sm transition hover:from-teal-600 hover:to-teal-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <svg
               viewBox="0 0 24 24"

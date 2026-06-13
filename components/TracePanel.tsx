@@ -9,8 +9,8 @@ export interface TraceItem {
 
 const KIND_STYLES: Record<TraceItem["kind"], { label: string; cls: string; tag: string }> = {
   thinking: { label: "think", cls: "text-slate-500 italic", tag: "text-slate-400" },
-  narration: { label: "agent", cls: "text-slate-700", tag: "text-sky-500" },
-  tool: { label: "action", cls: "font-medium text-sky-700", tag: "text-indigo-500" },
+  narration: { label: "agent", cls: "text-slate-700", tag: "text-teal-500" },
+  tool: { label: "action", cls: "font-medium text-teal-700", tag: "text-emerald-500" },
 };
 
 export function TracePanel({ items, live }: { items: TraceItem[]; live: boolean }) {
@@ -40,10 +40,10 @@ export function TracePanel({ items, live }: { items: TraceItem[]; live: boolean 
         </svg>
         <span className="text-sm font-semibold text-slate-900">Agent reasoning trace</span>
         {live ? (
-          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-medium text-teal-700">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-teal-500" />
             </span>
             live
           </span>

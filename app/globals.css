@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-nunito);
   --font-mono: var(--font-geist-mono);
 }
 
 @theme {
   --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 20px 40px -24px rgb(15 23 42 / 0.2);
   --shadow-card-hover: 0 1px 2px 0 rgb(15 23 42 / 0.06), 0 26px 50px -22px rgb(15 23 42 / 0.3);
-  --shadow-glow: 0 6px 20px -8px rgb(2 132 199 / 0.55);
+  --shadow-glow: 0 6px 20px -8px rgb(13 148 136 / 0.5);
   --animate-rise: rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -26,14 +26,14 @@
 body {
   color: #0f172a;
   background:
-    radial-gradient(1100px 520px at 50% -8%, rgb(14 165 233 / 0.1), transparent 62%),
-    linear-gradient(180deg, #f6f8fb 0%, #eef1f6 45%, #f6f8fb 100%);
+    radial-gradient(1100px 520px at 50% -8%, rgb(20 184 166 / 0.12), transparent 62%),
+    linear-gradient(180deg, #f5f9f8 0%, #eaf1f0 45%, #f5f9f8 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
 
 ::selection {
-  background: rgb(14 165 233 / 0.18);
+  background: rgb(20 184 166 / 0.22);
 }
 
 /* Slim, unobtrusive scrollbars for the sticky/overflow regions */

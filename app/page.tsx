@@ -183,9 +183,9 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4 px-6 py-3">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4 px-6 py-3.5">
           <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-500 via-cyan-500 to-indigo-600 text-white shadow-glow">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-emerald-600 text-white shadow-glow">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -200,10 +200,10 @@ export default function Home() {
               </svg>
             </span>
             <div className="leading-tight">
-              <h1 className="text-[15px] font-semibold tracking-tight text-slate-900">
+              <h1 className="text-xl font-semibold tracking-tight text-slate-900">
                 Clinical Trial Navigator
               </h1>
-              <p className="hidden text-xs text-slate-500 sm:block">
+              <p className="hidden text-sm text-slate-500 sm:block">
                 An agent that reasons about eligibility — not a search box.
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function Home() {
             )}
             {!results && mode === "start" && (
               <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300/80 bg-white/50 px-6 py-20 text-center">
-                <span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-sky-100 to-indigo-100 text-sky-600">
+                <span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
