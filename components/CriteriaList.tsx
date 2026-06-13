@@ -2,31 +2,37 @@ import type { CriterionVerdict, TrialBucket, Verdict } from "@/lib/types";
 
 const VERDICT_STYLES: Record<Verdict, { chip: string; label: string }> = {
   MET: { chip: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Met" },
-  NOT_MET: { chip: "bg-red-50 text-red-700 border-red-200", label: "Not met" },
+  NOT_MET: { chip: "bg-rose-50 text-rose-700 border-rose-200", label: "Not met" },
   UNKNOWN: { chip: "bg-amber-50 text-amber-700 border-amber-200", label: "Unknown" },
 };
 
-export const STATUS_STYLES: Record<TrialBucket, { banner: string; dot: string; label: string }> = {
+export const STATUS_STYLES: Record<
+  TrialBucket,
+  { banner: string; dot: string; label: string; accent: string }
+> = {
   QUALIFIES: {
     banner: "border-emerald-200 bg-emerald-50 text-emerald-800",
     dot: "bg-emerald-500",
     label: "Likely qualifies",
+    accent: "border-l-emerald-400",
   },
   NEAR_MISS: {
     banner: "border-amber-200 bg-amber-50 text-amber-800",
     dot: "bg-amber-500",
     label: "Near miss",
+    accent: "border-l-amber-400",
   },
   EXCLUDED: {
-    banner: "border-red-200 bg-red-50 text-red-800",
-    dot: "bg-red-400",
+    banner: "border-rose-200 bg-rose-50 text-rose-800",
+    dot: "bg-rose-400",
     label: "Likely excluded",
+    accent: "border-l-rose-300",
   },
 };
 
 export function CriteriaList({ criteria }: { criteria: CriterionVerdict[] }) {
   return (
-    <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white">
+    <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
       {criteria.map((c, i) => {
         const v = VERDICT_STYLES[c.verdict];
         return (

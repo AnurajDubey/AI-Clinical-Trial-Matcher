@@ -5,6 +5,74 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 20px 40px -24px rgb(15 23 42 / 0.2);
+  --shadow-card-hover: 0 1px 2px 0 rgb(15 23 42 / 0.06), 0 26px 50px -22px rgb(15 23 42 / 0.3);
+  --shadow-glow: 0 6px 20px -8px rgb(2 132 199 / 0.55);
+  --animate-rise: rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 body {
   color: #0f172a;
+  background:
+    radial-gradient(1100px 520px at 50% -8%, rgb(14 165 233 / 0.1), transparent 62%),
+    linear-gradient(180deg, #f6f8fb 0%, #eef1f6 45%, #f6f8fb 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgb(14 165 233 / 0.18);
+}
+
+/* Slim, unobtrusive scrollbars for the sticky/overflow regions */
+.scrollbar-slim {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+}
+.scrollbar-slim::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  background-color: rgb(203 213 225);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(148 163 184);
+}
+.scrollbar-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Custom chevrons replace the default disclosure triangles */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
