@@ -122,12 +122,15 @@ async function main() {
       answer = (await rl.question("> ")).trim();
     } else {
       if (answersUsed >= scenario.answers.length) {
-        throw new Error(
-          `Scenario ran out of scripted answers (used ${answersUsed}). Add more answers or record interactively.`,
-        );
+        // The agent asked more questions than the scenario scripted (e.g. an
+        // extra post-search information-gain question). Answer neutrally so the
+        // run completes gracefully instead of crashing.
+        answer = "I'm not certain about that one — please go ahead with what you have so far.";
+        console.log(`PATIENT (fallback — scripted answers exhausted): ${answer}`);
+      } else {
+        answer = scenario.answers[answersUsed++];
+        console.log(`PATIENT: ${answer}`);
       }
-      answer = scenario.answers[answersUsed++];
-      console.log(`PATIENT: ${answer}`);
     }
 
     recorder.recordUserMessage(answer);

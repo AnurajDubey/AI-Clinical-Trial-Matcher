@@ -1,4 +1,4 @@
-// The five tools the agent can choose between, and the dispatcher that
+// The tools the agent can choose between, and the dispatcher that
 // executes them against AgentState. The model decides WHICH tool to call;
 // this file is the HOW.
 
@@ -72,6 +72,15 @@ export const AGENT_TOOLS: Anthropic.Tool[] = [
     },
   },
   {
+    name: "reviewUnknowns",
+    description:
+      "Review the eligibility criteria that came back UNKNOWN across the trials evaluated so far that are still in play (qualifying or near-miss). Use this after a round of evaluateTrial to find the highest-information-gain question: the single missing patient fact that would resolve UNKNOWN criteria across the most trials. Call it before finishing whenever evaluations produced UNKNOWNs.",
+    input_schema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
     name: "finish",
     description:
       "End the navigation session and present final results. Call when the promising candidates are evaluated and near-misses have gap analyses — or when nothing more useful can be done.",
@@ -102,6 +111,8 @@ export async function dispatchTool(
       return runEvaluate(input, state, emit);
     case "computeGap":
       return runComputeGap(input, state, emit);
+    case "reviewUnknowns":
+      return runReviewUnknowns(state, emit);
     case "finish": {
       const message = typeof input.message === "string" ? input.message : "Navigation complete.";
       state.done = true;
@@ -134,7 +145,8 @@ async function runSearch(
 
   const found = await ctgovSearch({ condition, intervention, pageSize: 25 });
 
-  const survivors: Trial[] = [];
+  const existingIds = new Set(state.candidates.map((t) => t.nctId));
+  const newSurvivors: Trial[] = [];
   const excluded: { trial: Trial; verdict: NonNullable<ReturnType<typeof prefilterTrial>> }[] = [];
   const distanceLabels: Record<string, string> = {};
   for (const trial of found) {
@@ -144,34 +156,43 @@ async function runSearch(
     if (pre) {
       excluded.push({ trial, verdict: pre });
       state.verdicts[trial.nctId] = pre;
-    } else {
-      survivors.push(trial);
+    } else if (!existingIds.has(trial.nctId)) {
+      newSurvivors.push(trial);
+      existingIds.add(trial.nctId);
     }
   }
-  state.candidates = survivors;
+  // Accumulate candidates across searches (dedup by nctId) instead of
+  // overwriting — so a trial surfaced by an earlier query isn't lost (and its
+  // verdict left unrenderable) when the agent re-searches with a new strategy.
+  state.candidates = [...state.candidates, ...newSurvivors];
   state.history.push({
     tool: "searchTrials",
-    detail: `${found.length} found, ${excluded.length} pre-excluded`,
+    detail: `${found.length} found, ${newSurvivors.length} new, ${excluded.length} pre-excluded`,
   });
 
-  emit({ type: "candidates", trials: survivors, excluded, distanceLabels });
+  emit({ type: "candidates", trials: newSurvivors, excluded, distanceLabels });
 
-  const shortlist = survivors.slice(0, 12).map((t) => ({
-    nctId: t.nctId,
-    title: t.briefTitle.slice(0, 110),
-    phases: t.phases,
-    sex: t.eligibility.sex ?? "ALL",
-    ageRange: `${t.eligibility.minimumAgeYears ?? "?"}–${t.eligibility.maximumAgeYears ?? "no max"}`,
-    sites: t.locations.length,
-    nearestSiteKm: distanceLabels[t.nctId] ?? "unknown",
-  }));
+  const shortlist = state.candidates.slice(0, 14).map((t) => {
+    const near = nearestSite(t, state.profile);
+    return {
+      nctId: t.nctId,
+      title: t.briefTitle.slice(0, 110),
+      phases: t.phases,
+      sex: t.eligibility.sex ?? "ALL",
+      ageRange: `${t.eligibility.minimumAgeYears ?? "?"}–${t.eligibility.maximumAgeYears ?? "no max"}`,
+      sites: t.locations.length,
+      nearestSiteKm: near ? `${Math.round(near.km).toLocaleString()} km` : "unknown",
+    };
+  });
 
   return JSON.stringify({
     totalFound: found.length,
+    newCandidatesThisSearch: newSurvivors.length,
+    totalUniqueCandidates: state.candidates.length,
     preExcludedByCode: excluded.length,
     preExclusionExamples: excluded.slice(0, 3).map((e) => `${e.trial.nctId}: ${e.verdict.summary}`),
     candidates: shortlist,
-    note: `Top ${shortlist.length} of ${survivors.length} candidates shown, in relevance order. Evaluation budget: ${MAX_EVALUATIONS_PER_RUN} per run.`,
+    note: `${newSurvivors.length} new candidate(s) this search; ${state.candidates.length} unique candidate(s) accumulated across all searches so far (showing top ${shortlist.length}). Evaluate up to ${MAX_EVALUATIONS_PER_RUN} distinct trials — re-evaluating one after you learn a new fact is free.`,
   });
 }
 
@@ -181,9 +202,16 @@ async function runEvaluate(
   emit: (e: AgentEvent) => void,
 ): Promise<string> {
   const nctId = String(input.nctId ?? "").trim();
-  const used = state.history.filter((h) => h.tool === "evaluateTrial").length;
-  if (used >= MAX_EVALUATIONS_PER_RUN) {
-    return `Evaluation budget (${MAX_EVALUATIONS_PER_RUN}) reached for this run. Compute gaps for near-misses or finish.`;
+  // Budget is the number of DISTINCT trials reasoned about — re-evaluating a
+  // trial you've already seen (e.g. after learning a new fact that resolves an
+  // UNKNOWN) does not cost budget, which is what makes the post-search
+  // information-gain loop viable.
+  const evaluatedIds = new Set(
+    state.history.filter((h) => h.tool === "evaluateTrial").map((h) => h.detail.split(" ")[0]),
+  );
+  const isReeval = evaluatedIds.has(nctId);
+  if (!isReeval && evaluatedIds.size >= MAX_EVALUATIONS_PER_RUN) {
+    return `Evaluation budget (${MAX_EVALUATIONS_PER_RUN} distinct trials) reached. You can still re-evaluate a trial you've already seen (free — e.g. after an answer resolves an UNKNOWN), call reviewUnknowns, compute gaps for near-misses, or finish.`;
   }
   const trial = state.candidates.find((t) => t.nctId === nctId) ?? (await getTrial(nctId));
   if (!trial) return `Error: trial ${nctId} not found.`;
@@ -199,12 +227,19 @@ async function runEvaluate(
   const blocking = verdict.criteria
     .filter((c) => c.verdict !== "MET")
     .map((c) => `[${c.verdict}] ${c.text.slice(0, 100)} — ${c.reason}`);
+  const unknownCount = verdict.criteria.filter((c) => c.verdict === "UNKNOWN").length;
   return JSON.stringify({
     nctId,
     status: verdict.status,
     summary: verdict.summary,
     blockingCriteria: blocking,
-    evaluationsRemaining: MAX_EVALUATIONS_PER_RUN - used - 1,
+    unknownCriteria: unknownCount,
+    distinctTrialsRemaining: MAX_EVALUATIONS_PER_RUN - evaluatedIds.size - (isReeval ? 0 : 1),
+    ...(unknownCount > 0
+      ? {
+          tip: "Some criteria are UNKNOWN — they hinge on a patient fact not yet known. Once you've evaluated your shortlist, call reviewUnknowns to find the one question that resolves the most of these.",
+        }
+      : {}),
   });
 }
 
@@ -230,4 +265,52 @@ async function runComputeGap(
   emit({ type: "gap", nctId, path });
 
   return JSON.stringify({ nctId, pathToEligibility: path });
+}
+
+// Aggregates UNKNOWN criteria across every still-in-play trial (qualifying or
+// near-miss) so the model can pick the single question with the most leverage —
+// the post-search, evidence-grounded version of the intake info-gain choice.
+// The clustering of varied criterion text into one "missing fact" is left to
+// the model; this just hands it a clean, complete picture.
+function runReviewUnknowns(state: AgentState, emit: (e: AgentEvent) => void): string {
+  const trials = Object.entries(state.verdicts)
+    .filter(([, v]) => v.status === "QUALIFIES" || v.status === "NEAR_MISS")
+    .map(([nctId, v]) => {
+      const title = state.candidates.find((t) => t.nctId === nctId)?.briefTitle.slice(0, 90) ?? nctId;
+      const unknowns = v.criteria
+        .filter((c) => c.verdict === "UNKNOWN")
+        .map((c) => ({ requirement: c.text, missingFact: c.reason, kind: c.kind }));
+      return { nctId, title, status: v.status, unknowns };
+    })
+    .filter((t) => t.unknowns.length > 0);
+
+  const totalUnknownCriteria = trials.reduce((n, t) => n + t.unknowns.length, 0);
+
+  emit({
+    type: "tool",
+    name: "reviewUnknowns",
+    detail:
+      trials.length > 0
+        ? `Reviewing ${totalUnknownCriteria} open unknown${totalUnknownCriteria === 1 ? "" : "s"} across ${trials.length} in-play trial${trials.length === 1 ? "" : "s"}`
+        : "Reviewing open unknowns — none remain in the in-play trials",
+  });
+  state.history.push({
+    tool: "reviewUnknowns",
+    detail: `${trials.length} trials, ${totalUnknownCriteria} unknowns`,
+  });
+
+  if (trials.length === 0) {
+    return JSON.stringify({
+      trialsWithUnknowns: 0,
+      note: "No unresolved UNKNOWNs in the in-play (qualifying or near-miss) trials. Proceed to computeGap for the near-misses, then finish.",
+    });
+  }
+
+  return JSON.stringify({
+    trialsWithUnknowns: trials.length,
+    totalUnknownCriteria,
+    trials,
+    instruction:
+      "Find the SINGLE patient fact that, if known, would resolve UNKNOWN criteria across the most of these trials — that is the highest-information-gain question. If one clearly dominates and the patient could reasonably know it, ask it with askPatient, then re-evaluate the affected trials (re-evaluation is free) so their UNKNOWNs resolve to MET or NOT_MET. If the unknowns are scattered, unanswerable by the patient, or low-impact, skip ahead to gaps and finish instead.",
+  });
 }

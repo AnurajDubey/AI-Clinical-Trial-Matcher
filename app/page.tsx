@@ -98,9 +98,18 @@ export default function Home() {
         break;
       case "candidates": {
         const excludedTrials = event.excluded.map((e) => e.trial);
-        setDistanceLabels(event.distanceLabels);
+        setDistanceLabels((prev) => ({ ...prev, ...event.distanceLabels }));
         mutateResults((r) => {
-          r.trials = [...event.trials, ...excludedTrials];
+          // Merge across searches (dedup by nctId) so earlier results persist.
+          const seen = new Set(r.trials.map((t) => t.nctId));
+          const merged = [...r.trials];
+          for (const t of [...event.trials, ...excludedTrials]) {
+            if (!seen.has(t.nctId)) {
+              merged.push(t);
+              seen.add(t.nctId);
+            }
+          }
+          r.trials = merged;
           for (const { trial, verdict } of event.excluded) r.verdicts[trial.nctId] = verdict;
         });
         break;

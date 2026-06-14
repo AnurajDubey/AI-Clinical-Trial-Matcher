@@ -1,1 +1,7 @@
-[]
+[
+ {
+  "file": "maria.json",
+  "name": "Maria — metastatic breast cancer, San Diego",
+  "description": "Intake pins down receptor status, then finds qualifying trials plus near-misses with concrete paths (washout windows, a missing test, cohort fit)."
+ }
+]
