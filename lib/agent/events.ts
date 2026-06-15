@@ -18,9 +18,10 @@ export interface Continuation {
 
 export type AgentEvent =
   | { type: "userMessage"; text: string } // recorded sessions only — the patient's side
-  | { type: "thinking"; delta: string }
-  | { type: "narration"; delta: string }
-  | { type: "tool"; name: string; detail: string }
+  // `agent` scopes a trace line to a sub-agent (e.g. "analyst"); absent = the navigator.
+  | { type: "thinking"; delta: string; agent?: string }
+  | { type: "narration"; delta: string; agent?: string }
+  | { type: "tool"; name: string; detail: string; agent?: string }
   | { type: "profile"; profile: PatientProfile; unknowns: string[] }
   | {
       type: "candidates";
@@ -29,6 +30,10 @@ export type AgentEvent =
       distanceLabels: Record<string, string>;
     }
   | { type: "evaluating"; nctId: string }
+  // The eligibility-analyst sub-agent brackets its work with these so the UI
+  // can render its reasoning as a nested lane under the navigator.
+  | { type: "analystStart"; nctId: string; title: string }
+  | { type: "analystEnd"; nctId: string; status: TrialVerdict["status"] }
   | { type: "verdict"; nctId: string; verdict: TrialVerdict }
   | { type: "gap"; nctId: string; path: string }
   | { type: "ask"; question: string; continuation?: Continuation } // continuation absent in recordings

@@ -5,7 +5,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { searchTrials as ctgovSearch, getTrial } from "@/lib/ctgov";
 import { nearestSite, prefilterTrial } from "@/lib/prefilter";
-import { evaluateTrial } from "./evaluateTrial";
+import { runEligibilityAnalyst } from "./eligibilityAnalyst";
 import { computeGap } from "./computeGap";
 import type { AgentEvent } from "./events";
 import type { AgentState, Trial } from "@/lib/types";
@@ -50,7 +50,7 @@ export const AGENT_TOOLS: Anthropic.Tool[] = [
   {
     name: "evaluateTrial",
     description:
-      "Reason over ONE candidate trial's full eligibility criteria against the patient profile, criterion by criterion. Call this for the most promising candidates after a search. Each call is expensive — prioritize, and respect the per-run budget the results report.",
+      "Hand ONE candidate trial to the eligibility-analysis sub-agent. It reasons over the trial's full criteria against the patient profile criterion by criterion (pulling extra protocol detail itself when needed) and returns a per-criterion verdict. Call this for the most promising candidates after a search. Each call is expensive — prioritize, and respect the per-run budget the results report.",
     input_schema: {
       type: "object",
       properties: {
@@ -216,10 +216,11 @@ async function runEvaluate(
   const trial = state.candidates.find((t) => t.nctId === nctId) ?? (await getTrial(nctId));
   if (!trial) return `Error: trial ${nctId} not found.`;
 
-  emit({ type: "tool", name: "evaluateTrial", detail: `Evaluating ${nctId} — ${trial.briefTitle.slice(0, 80)}` });
   emit({ type: "evaluating", nctId });
 
-  const verdict = await evaluateTrial(trial, state.profile);
+  // Delegate the deep, single-trial reasoning to the eligibility-analyst
+  // sub-agent. It streams its own trace (analystStart → … → analystEnd).
+  const verdict = await runEligibilityAnalyst({ trial, profile: state.profile, emit });
   state.verdicts[nctId] = verdict;
   state.history.push({ tool: "evaluateTrial", detail: `${nctId} → ${verdict.status}` });
   emit({ type: "verdict", nctId, verdict });

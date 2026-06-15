@@ -60,9 +60,10 @@ All-TypeScript, single repo. Keep it lean.
 
 ### Do NOT use (deliberate choices — do not add these)
 
-- ❌ **No agent framework** — no LangGraph, no CrewAI, no AutoGen. The agent is a
-  custom controller loop built on the SDK's tool use. At this complexity the SDK
-  already provides everything the loop needs.
+- ❌ **No agent framework** — no LangGraph, no CrewAI, no AutoGen. The agents are
+  custom loops built directly on the SDK's tool use — a navigator that delegates
+  to an eligibility-analyst sub-agent (see §4). Even multi-agent, the plain SDK
+  provides everything the loops need.
 - ❌ **Not the Claude Agent SDK** — that's for autonomous coding/computer-use
   agents; wrong shape and overkill here. Use the plain API SDK (`@anthropic-ai/sdk`).
 - ❌ **No database / no Supabase** — there is nothing to persist. Replay sessions
@@ -86,18 +87,23 @@ All-TypeScript, single repo. Keep it lean.
 └────────────────────────────────┬───────────────────────────────────────┘
                                  ▼
                     ┌──────────────────────────┐
-                    │   AGENT CONTROLLER LOOP   │
+                    │      NAVIGATOR  LOOP      │
                     │  while not done:          │
-                    │   1. ask model: next move?│ ◄── the model DECIDES the
-                    │   2. dispatch chosen tool │     next action. THIS is
-                    │   3. record observation   │     what makes it an agent.
+                    │   1. ask model: next move?│ ◄── the model DECIDES the next
+                    │   2. dispatch chosen tool │     action. THIS is what makes
+                    │   3. record observation   │     it an agent.
                     │   4. update state         │
                     └─────────┬────────────────┘
-                              │ model picks ONE tool per turn
-   ┌─────────────┬────────────┼──────────────┬──────────────┐
-   ▼             ▼            ▼              ▼              ▼
- askPatient  searchTrials  evaluateTrial  computeGap     finish
- (→UI, wait) (→CT.gov API) (→ LLM call)   (→ LLM call)   (→ results)
+                              │ model picks ONE tool per turn:
+                              │ askPatient · searchTrials · evaluateTrial ·
+                              │ reviewUnknowns · computeGap · finish
+                              ▼  (evaluateTrial delegates ↓)
+            ┌────────────────────────────────────┐
+            │   ELIGIBILITY-ANALYST  sub-agent    │ ◄── depth: its own loop,
+            │   own loop over ONE trial:          │     tools & budget, in
+            │   getTrialDetail → reason →         │     isolated context
+            │   finalizeVerdict → verdict         │     (just this trial)
+            └────────────────────────────────────┘
 ```
 
 The **Runner** is an interface with two implementations that emit the *same*
@@ -140,28 +146,45 @@ interface AgentState {
     criteria: { text: string; verdict: Verdict; reason: string }[];
   }>;
   nearMissPaths: Record<string, string>;  // nctId -> path to eligibility (#1)
-  history: unknown[];                     // running transcript / tool log
+  history: { tool: string; detail: string }[]; // running tool log
   done: boolean;
 }
 ```
 
-### The five tools (declared to the SDK via tool use)
+### Two agents (navigator + eligibility-analyst)
 
-The model chooses one per turn; the controller dispatches it, records the result
-into state, and loops.
+Both are hand-rolled loops on the SDK's tool use — no framework.
+
+**Navigator** (`lib/agent/controller.ts`) — owns the session (breadth). The model
+chooses one tool per turn; the loop dispatches it, records the result into state,
+and loops. Its tools:
 
 - **`askPatient(question)`** — surface a question to the UI and wait for the
-  user's answer; update `profile`. The model picks the *highest-value* question
-  given current `profile`/`unknowns` (this is differentiator #2).
-- **`searchTrials(query)`** — build a query from the profile and call the
-  ClinicalTrials.gov API; populate `candidates`.
-- **`evaluateTrial(nctId)`** — LLM reasons over one trial's `eligibilityCriteria`
-  (and `armGroups[].description`) criterion-by-criterion → `MET / NOT_MET /
-  UNKNOWN` each, with a short reason; classify the trial.
-- **`computeGap(nctId)`** — for a near-miss, LLM counterfactual reasoning →
-  the path to eligibility (washout timing / missing test / required prior
-  therapy / a different cohort). This is differentiator #1.
+  answer; `profile` is updated for the model (differentiator #2).
+- **`searchTrials(query)`** — query ClinicalTrials.gov; survivors **accumulate
+  and dedupe** into `candidates` across multiple searches.
+- **`evaluateTrial(nctId)`** — hand the trial to the **eligibility-analyst
+  sub-agent** (below); store its verdict.
+- **`reviewUnknowns()`** — aggregate `UNKNOWN` criteria across the in-play trials
+  so the model can ask the one post-search question that resolves the most
+  (info-gain grounded in the actual trials — a deeper turn of differentiator #2).
+- **`computeGap(nctId)`** — for a near-miss, counterfactual reasoning → the path
+  to eligibility (washout / missing test / prior therapy / a different cohort).
+  Differentiator #1.
 - **`finish()`** — produce the final results view.
+
+**Eligibility-analyst** (`lib/agent/eligibilityAnalyst.ts`) — a sub-agent the
+navigator spawns to judge ONE trial (depth). It runs its own short tool-use loop
+in isolated context (just that trial + the patient), with its own turn budget.
+Its tools:
+
+- **`getTrialDetail()`** — pull the trial's full protocol narrative when the
+  bullet criteria are ambiguous about cohorts or prior-therapy lines.
+- **`finalizeVerdict(...)`** — submit the structured criterion-by-criterion
+  verdict (`MET / NOT_MET / UNKNOWN` each + overall status + summary).
+
+Re-evaluation is "free" against the navigator's per-run budget (which counts
+*distinct* trials), so resolving an `UNKNOWN` can flip a verdict without cost.
 
 ### Controller loop (the human owns this)
 
@@ -307,13 +330,16 @@ at slice 3 or 4 with something real.
 
 ## 10. Comprehension anchors (for the human)
 
-After each generation, you understand the whole agent if you can explain these
-four things. Use "can I explain these four?" as your checkpoint:
+After each generation, you understand the system if you can explain these five
+things. Use "can I explain these?" as your checkpoint:
 
 1. **The state object** — what the agent knows at any moment.
-2. **The controller loop** — where the model decides the next action.
-3. **One tool (e.g. `evaluateTrial`)** — how a single reasoning step works.
-4. **The Runner** — how live vs. replay swaps without the UI noticing.
+2. **The navigator loop** — where the model decides the next action.
+3. **The eligibility-analyst sub-agent** — how the navigator delegates one
+   trial's deep reasoning to a second agent with its own loop, tools, and budget.
+4. **One reasoning step inside it (`finalizeVerdict`)** — how a single
+   criterion-by-criterion verdict is produced and joined back to the criteria.
+5. **The Runner** — how live vs. replay swaps without the UI noticing.
 
 ---
 
@@ -324,3 +350,27 @@ four things. Use "can I explain these four?" as your checkpoint:
   docs.claude.com rather than older patterns.
 - Before wiring the API hard, pull one real CT.gov response and confirm the field
   paths above against the live JSON.
+
+---
+
+## 12. Implementation notes (built beyond the original slice plan)
+
+Deliberate evolutions made to deepen the agentic behavior (the project's headline
+goal) — all still on the plain SDK, no framework:
+
+- **Two-agent decomposition.** `evaluateTrial` is no longer a single LLM call; the
+  navigator hands each trial to an **eligibility-analyst sub-agent** that runs its
+  own loop (fetch full detail → reason → finalize) in isolated context. Depth
+  where it earns its keep; everything else stays as tools, not extra agents.
+- **`reviewUnknowns` + post-search info-gain loop.** After evaluating, the
+  navigator reviews `UNKNOWN` criteria across the in-play trials and asks the
+  single highest-leverage question, then re-evaluates the affected trials
+  (re-evaluation is free against the distinct-trial budget).
+- **Candidate accumulation.** Search survivors merge and dedupe across searches
+  instead of overwriting, so a trial found by an earlier query is never lost.
+- **The live trace shows both agents.** Navigator steps stream in one lane; each
+  `evaluateTrial` opens a nested lane with the eligibility-analyst's own
+  reasoning (`analystStart` → … → `analystEnd` events, `agent`-scoped trace
+  lines).
+- **UI is a real product surface** — sticky two-column layout, the live nested
+  reasoning trace, a teal health theme, soft typography, and a polish pass.

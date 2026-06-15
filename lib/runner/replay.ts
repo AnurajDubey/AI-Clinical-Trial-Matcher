@@ -44,7 +44,7 @@ export function replaySession(
           const { delta } = event;
           for (let i = 0; i < delta.length; i += THINKING_CHUNK) {
             if (cancelled) return;
-            onEvent({ type: event.type, delta: delta.slice(i, i + THINKING_CHUNK) });
+            onEvent({ type: event.type, delta: delta.slice(i, i + THINKING_CHUNK), agent: event.agent });
             await sleep(16);
           }
           continue;
@@ -60,6 +60,10 @@ export function replaySession(
         case "verdict":
         case "gap":
           await sleep(250);
+          break;
+        case "analystStart":
+        case "analystEnd":
+          await sleep(200);
           break;
         default:
           break;

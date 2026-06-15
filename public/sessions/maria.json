@@ -1,7 +1,7 @@
 {
  "name": "Maria — metastatic breast cancer, San Diego",
  "description": "Intake pins down receptor status, then finds qualifying trials plus near-misses with concrete paths (washout windows, a missing test, cohort fit).",
- "recordedAt": "2026-06-14T01:01:05.064Z",
+ "recordedAt": "2026-06-15T03:40:09.944Z",
  "events": [
   {
    "type": "userMessage",
@@ -31,11 +31,11 @@
   },
   {
    "type": "thinking",
-   "delta": "The prior trastuzumab treatment strongly suggests HER2-positive disease, but I need to confirm the complete biomarker profile—particularly the hormone receptor status (ER/PR) and verify HER2 positivity—since these are the critical factors that will guide treatment decisions."
+   "delta": "The patient's prior trastuzumab treatment confirms HER2-positive status, but I need to determine hormone receptor status since that's the key factor distinguishing treatment options for metastatic disease."
   },
   {
    "type": "ask",
-   "question": "To find the right trials for Maria, it helps to know her tumor's receptor status. Do you know if her breast cancer is HER2-positive, and whether it's hormone receptor (estrogen/progesterone) positive or negative?"
+   "question": "Since your mom was treated with trastuzumab, her cancer is likely HER2-positive — do you know whether it's also hormone receptor positive (estrogen or progesterone receptor positive)?"
   },
   {
    "type": "userMessage",
@@ -69,7 +69,7 @@
   },
   {
    "type": "thinking",
-   "delta": "I'm looking at a case of HER2-positive, ER-positive metastatic breast cancer."
+   "delta": "I'm searching for information on metastatic HER2-positive, ER-positive breast cancer to understand the clinical characteristics and treatment options for this specific subtype."
   },
   {
    "type": "tool",
@@ -9848,156 +9848,176 @@
   },
   {
    "type": "thinking",
-   "delta": "I'm filtering for HER2-positive trials since several candidates don't match that criteria, and NCT05150691 with its HER2-targeted ADC at zero distance looks particularly promising, though I should also evaluate NCT07299825 and the neoadjuvant combination therapy option despite the greater distance."
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT05150691 — A Phase 1/2a Study of DB-1303/BNT323 in Advanced/Metastatic Solid Tumors"
+   "delta": "I'm identifying the most relevant HER2-positive trials from the list—DB-1303/BNT323 looks promising as a HER2-targeting antibody-drug conjugate, along with A166 for HER2-positive breast cancer and the NeoB combination approach. I need to filter out the HER2-negative cases since they don't match the criteria, and I'm also noting a PIK3CA-mutated trial that might be relevant depending on the context."
   },
   {
    "type": "evaluating",
    "nctId": "NCT05150691"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT05150691",
+   "title": "A Phase 1/2a Study of DB-1303/BNT323 in Advanced/Metastatic Solid Tumors"
+  },
+  {
+   "type": "thinking",
+   "delta": "Looking at whether this patient meets the trial's inclusion criteria for HER2-positive advanced solid tumors—they have HER2-positive breast cancer with prior trastuzumab and paclitaxel exposure, which suggests advanced disease even though metastatic status isn't explicitly documented.\n\nGoing through the criteria: HER2 positivity is confirmed, but measurable disease, ECOG performance status, cardiac function, organ function, and life expectancy are all unknown from the available information. Most exclusion criteria are also indeterminate without additional clinical data. Since the disease type matches and there's no obvious disqualifying information, but critical clinical and administrative details are missing, this looks like a near miss—the patient could potentially fit, but I'd need more complete staging and functional assessment data to be confident.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT05150691",
+   "status": "NEAR_MISS"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT05150691",
    "verdict": {
     "status": "NEAR_MISS",
-    "summary": "Your HER2-positive breast cancer and prior trastuzumab/paclitaxel treatment align well with this trial's target population. However, several required details—measurable disease, ECOG status, heart function (LVEF), and lab results—are not in your profile and would need testing at the trial site. The trial site confirms final eligibility.",
+    "summary": "Your HER2-positive breast cancer with prior trastuzumab and paclitaxel fits this trial's target population, and there are breast-cancer cohorts. However, the profile doesn't confirm key requirements like advanced/metastatic status, a measurable lesion, ECOG status, heart function (LVEF), and organ function. The trial site would need to confirm these details, but nothing in your profile clearly disqualifies you.",
     "criteria": [
      {
       "text": "Has a pathologically documented HER2-positive or HER2-expressing (except for cohort 2h where the requirement is HER2-null), advanced/unresectable, recurrent, or metastatic malignant solid tumor that is refractory to or intolerable with standard treatment, or for which no standard treatment is available.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "HER2-positive breast cancer with prior trastuzumab/paclitaxel suggests advanced HER2-positive tumor"
+      "reason": "HER2-positive breast cancer with prior trastuzumab/paclitaxel fits HER2-positive solid tumor target; trial includes breast cohorts."
      },
      {
       "text": "At least 1 measurable lesion (per RECIST 1.1)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No documentation of measurable RECIST 1.1 lesion"
+      "reason": "No information on measurable lesions per RECIST 1.1."
      },
      {
       "text": "Provide signed informed consent",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Consent status not stated"
+      "reason": "Informed consent status not documented; administrative."
      },
      {
       "text": "ECOG performance status (PS) of 0-1.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "ECOG performance status not reported"
+      "reason": "ECOG performance status not provided."
      },
      {
       "text": "LVEF ≥ 50% by ECHO or MUGA",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No LVEF measurement available"
+      "reason": "LVEF not reported."
      },
      {
       "text": "Adequate organ functions",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Organ function labs not provided"
+      "reason": "Organ function labs not provided."
      },
      {
       "text": "Provide pre-existing diagnosis of HER2 status or resected tumor samples or undergo fresh tumor biopsy for HER2 testing.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "HER2-positive status documented in biomarkers"
+      "reason": "HER2-positive status is documented in the profile."
      },
      {
       "text": "Life expectancy of ≥ 3 months. Additional for Part 2 Expansion Group 9: 1\\. Has pathologically documented advanced/unresectable, recurrent, or metastatic EC (including UCS and USPC) and has progressed on or after at least 1 line of systemic treatment including platinum-based therapy and exposure to ICI but no more than prior 3 lines of therapy for advanced/unresectable, or metastatic disease. Note: endocrine therapy will not qualify as a systemic therapy line.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Life expectancy not documented"
+      "reason": "Life expectancy not stated."
      },
      {
       "text": "History of symptomatic CHF (New York Heart Association \\[NYHA\\] classes II-IV) or serious cardiac arrhythmia requiring treatment.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No history of CHF or arrhythmia reported"
+      "verdict": "UNKNOWN",
+      "reason": "No cardiac history information provided."
      },
      {
       "text": "History of myocardial infarction or unstable angina within 6 months before Day 1.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No cardiac event history reported"
+      "verdict": "UNKNOWN",
+      "reason": "No history of MI or angina reported."
      },
      {
       "text": "Average QTcF \\> 450 ms in males and \\> 470 ms in females",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "QTcF value not available"
+      "reason": "QTcF not reported."
      },
      {
       "text": "History of clinically significant lung diseases",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No lung disease reported"
+      "verdict": "UNKNOWN",
+      "reason": "No lung disease information provided."
      },
      {
       "text": "Uncontrolled infection requiring IV antibiotics, antivirals, or antifungals.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No active infection reported"
+      "verdict": "UNKNOWN",
+      "reason": "No infection status reported."
      },
      {
       "text": "HIV infection with AIDS defining illness or active viral hepatitis.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No HIV or hepatitis reported"
+      "verdict": "UNKNOWN",
+      "reason": "No HIV/hepatitis status reported."
      },
      {
       "text": "Clinically active brain metastases",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Brain metastasis status not documented"
+      "reason": "No brain metastasis information provided."
      },
      {
       "text": "Unresolved toxicities from previous anticancer therapy, defined as toxicities not yet resolved to NCI-CTCAE version 5.0, Grade ≤ 1 or baseline.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Unresolved prior toxicity status unknown"
+      "reason": "Unresolved prior toxicities not documented."
      },
      {
       "text": "A known hypersensitivity to either the drug substances or inactive ingredients in the drug product.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No known hypersensitivity reported"
+      "verdict": "UNKNOWN",
+      "reason": "No known hypersensitivity information."
      },
      {
       "text": "Part 2 (expansion) Only:Multiple primary malignancies within 3 years, except adequately resected non- melanoma skin cancer, curatively treated in-situ disease, other solid tumors curatively treated, or contralateral breast cancer.",
       "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No second primary malignancy reported"
+      "verdict": "UNKNOWN",
+      "reason": "No information on multiple primary malignancies."
      }
     ]
    }
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT07299825 — A Study of A166 in Patients With HER2-Positive Unresectable or Metastatic Breast"
   },
   {
    "type": "evaluating",
    "nctId": "NCT07299825"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT07299825",
+   "title": "A Study of A166 in Patients With HER2-Positive Unresectable or Metastatic Breast Cancer"
+  },
+  {
+   "type": "thinking",
+   "delta": "The patient doesn't meet inclusion criterion [3] because they haven't received a HER2 ADC with a topoisomerase inhibitor payload like trastuzumab deruxtecan—they only had trastuzumab and paclitaxel. This is a prior therapy requirement that's currently unmet, though potentially addressable in the future.\n\nNow I'm systematically checking all the criteria: age 54 fits the 18-75 range, HER2+ breast cancer is documented, but the HER2 ADC requirement isn't satisfied. Disease progression and measurable lesions are unknown. For exclusions, there's no history of previous A166 or relevant HER2 ADCs, no documented hypersensitivity, and no permanent discontinuation of trastuzumab due to toxicity.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT07299825",
+   "status": "NEAR_MISS"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT07299825",
    "verdict": {
     "status": "NEAR_MISS",
-    "summary": "Your profile matches the trial's age and HER2-positive breast cancer requirements, but the trial requires that you have previously received a HER2 antibody-drug conjugate with a topoisomerase inhibitor payload (such as trastuzumab deruxtecan), which is not listed in your prior treatments. Several other items (measurable disease, progression on last therapy, eye health, CNS status) are not documented. The trial site would confirm whether your full treatment history and current status meet eligibility.",
+    "summary": "Your profile fits the basic requirements (age, HER2-positive metastatic breast cancer), but this trial requires that one of your prior treatments was a HER2 antibody-drug conjugate with a topoisomerase inhibitor payload (such as trastuzumab deruxtecan). Your records show only trastuzumab and paclitaxel, so that key requirement is not yet met. Additional details about disease progression and measurable lesions are also needed. The study team would confirm whether you could qualify, possibly after receiving the required prior therapy.",
     "criteria": [
      {
       "text": "Male or female patient ≥ 18 years and ≤ 75 years when signing the informed consent form.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "Age 54 is within the 18-75 range."
+      "reason": "Patient is 54, within the 18–75 age range."
      },
      {
       "text": "Breast cancer patients by histopathology and/or cytology documented.",
@@ -10009,19 +10029,19 @@
       "text": "In the advanced or metastatic stage, having received no more than 5 lines of systemic therapy, one of which must include a HER2 ADC with a topoisomerase inhibitor payload.",
       "kind": "INCLUSION",
       "verdict": "NOT_MET",
-      "reason": "Prior therapy lacks a required HER2 ADC with topoisomerase inhibitor payload (e.g., T-DXd)."
+      "reason": "Prior therapy is only trastuzumab and paclitaxel; no required HER2 ADC with topoisomerase inhibitor payload received."
      },
      {
       "text": "Patients must have experienced disease progression or intolerance during or after the most recent treatment prior to randomization.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Progression/intolerance on most recent treatment not documented."
+      "reason": "No information on progression or intolerance after most recent treatment."
      },
      {
       "text": "At least one measurable lesion according to RECIST 1.1 criteria.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Presence of a measurable RECIST 1.1 lesion not stated."
+      "reason": "No information on measurable lesions per RECIST 1.1."
      },
      {
       "text": "Previous treatment with A166 or any HER2-targeted antibody-drug conjugate (ADC) with a microtubule inhibitor payload.",
@@ -10032,571 +10052,499 @@
      {
       "text": "Known history of severe hypersensitivity to other monoclonal antibodies, or allergy to A166 or their components.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No hypersensitivity history provided."
+      "verdict": "MET",
+      "reason": "No known severe monoclonal antibody hypersensitivity reported."
      },
      {
       "text": "Permanent discontinuation of trastuzumab or its biosimilars due to any toxicity in prior treatments.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Reason for stopping prior trastuzumab not documented."
+      "verdict": "MET",
+      "reason": "No record of trastuzumab discontinuation due to toxicity."
      },
      {
       "text": "Presence of severe corneal epithelial disease at baseline; or inability to perform daily activities without contact lenses.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on corneal or eye condition."
+      "verdict": "MET",
+      "reason": "No corneal epithelial disease reported."
      },
      {
       "text": "Presence of spinal cord compression or clinically active central nervous system (CNS) metastases.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on CNS metastases or spinal cord compression."
+      "verdict": "MET",
+      "reason": "No spinal cord compression or active CNS metastases reported."
      },
      {
       "text": "Other conditions considered by the investigator to make the patient unsuitable for participation in the study.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Investigator judgment cannot be assessed from profile."
+      "reason": "Investigator discretion cannot be assessed from profile."
      }
     ]
    }
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT06247995 — A Phase I/II, Dose Finding and Optimization Study of [177Lu]Lu-NeoB in Combinati"
   },
   {
    "type": "evaluating",
    "nctId": "NCT06247995"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT06247995",
+   "title": "A Phase I/II, Dose Finding and Optimization Study of [177Lu]Lu-NeoB in Combination With Capecitabine in Patients With GRPR+, ER+, HER2- Metastatic Breast Cancer After Progression on Previous Endocrine Therapy in Combination With a CDK4/6 Inhibitor."
+  },
+  {
+   "type": "thinking",
+   "delta": "The trial requires HER2-negative status, but this patient is HER2-positive, which is a fundamental mismatch that excludes them from the study. I'm checking the other criteria — the patient does meet the ER-positive requirement and is above the minimum age threshold.",
+   "agent": "analyst"
+  },
+  {
+   "type": "narration",
+   "delta": "This trial is for HER2-**negative** breast cancer; the patient is HER2-**positive**. That is a fundamental, non-addressable mismatch, so I can finalize as EXCLUDED without pulling the full protocol.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT06247995",
+   "status": "EXCLUDED"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT06247995",
    "verdict": {
     "status": "EXCLUDED",
-    "summary": "This trial is for HER2-negative, ER-positive metastatic breast cancer in patients who progressed after endocrine therapy plus a CDK4/6 inhibitor. Your profile shows HER2-positive disease and prior trastuzumab/paclitaxel rather than the required endocrine/CDK4/6i treatment, which is a fundamental mismatch. The trial site makes the final eligibility determination, but this study does not appear to fit your cancer subtype.",
+    "summary": "This study enrolls only HER2-negative, ER-positive metastatic breast cancer that has progressed on endocrine therapy plus a CDK4/6 inhibitor. The patient's cancer is HER2-positive, which directly conflicts with the trial's core requirement, and there is no record of prior endocrine therapy with a CDK4/6 inhibitor. The profile suggests this trial is not a fit; the site would confirm.",
     "criteria": [
-     {
-      "text": "Signed informed consent must be obtained prior to participation in the study.",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Consent status not documented in profile."
-     },
      {
       "text": "Participant is female or male adult ≥ 18 years old at the time of informed consent(s).",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "Patient is 54, meets ≥18 requirement."
+      "reason": "Patient is a 54-year-old adult, meeting the ≥18 requirement."
      },
      {
       "text": "Participant has a histologically and/or cytologically documented diagnosis of ER+ breast cancer (ER expression \\>10% of tumor cell nuclei stain (regardless of PgR expression) (based on the most recently analyzed tissue sample tested by a local laboratory).",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "Patient is ER positive."
+      "reason": "Patient is ER-positive, satisfying the ER+ diagnosis requirement."
      },
      {
       "text": "Participant has HER2-negative (as per ASCO-CAP guidelines Wolff et al 2018) breast cancer defined as a negative in situ hybridization test (ISH) or an IHC status of 0, 1+ or 2+. If IHC is 2+, a negative ISH (e.g., FISH, CISH, or SISH) (based on the most recently analyzed tissue sample tested by a local laboratory) is required. 5a. Participant received no more than three prior endocrine therapies (single agent or in combination with targeted therapy) regimen/s in the metastatic setting of which at least one included endocrine therapy in combination with a CDK4/6i. In addition:",
       "kind": "INCLUSION",
       "verdict": "NOT_MET",
-      "reason": "Patient is HER2-positive; trial requires HER2-negative disease and prior endocrine+CDK4/6i therapy."
+      "reason": "Patient is HER2-positive; trial requires HER2-negative breast cancer."
      },
      {
       "text": "in case of confirmed presence of deleterious or suspected deleterious germline BRCA1 or BRCA2 mutation, the participant may also have received a PARP inhibitor-based therapy.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No BRCA mutation status provided."
+      "reason": "No germline BRCA status reported; this is a conditional allowance only."
      },
      {
       "text": "In case of HER2-low breast cancer (IHC 1+ or IHC 2+ with ISH negative as per ASCO-CAP guidelines Wolff et al 2023), the participant may also have received trastuzumab deruxtecan \\[Enhertu®\\]). 6\\. Participant has metastatic breast cancer with radiologically confirmed progression of disease after the most recent therapy 7. Participant must have measurable disease, i.e., at least one measurable lesion as per RECIST 1.1. (a lesion at a previously irradiated site may only be counted as a target lesion if there is a clear sign of progression since the irradiation) as per local assessment. Note: If only lytic bone lesions are present, they must have at least one lesion with a soft tissue component that can be evaluated by CT or MRI and meets the definition of measurability as per RECIST 1.1 criteria (participants with only one predominantly lytic bone lesion that has been previously irradiated are eligible if there is documented evidence of disease progression of the bone lesion after irradiation). 8a. Participant has at least one target lesion \\[as per RECIST 1.1 and based on the baseline stand-alone contrast-enhanced CT (or MRI)\\] with \\[68Ga\\]Ga-NeoB uptake greater than the physiological uptake of the liver at PET/CT or PET/MRI, as per local reading. In addition:",
       "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Not HER2-low; HER2-positive, criterion not applicable."
+      "verdict": "NOT_MET",
+      "reason": "Patient is HER2-positive, not HER2-low; does not fit this allowance."
      },
      {
       "text": "Participants with liver or lung disease involvement must show \\[68Ga\\]Ga-NeoB uptake greater than the physiological uptake of the liver as follows:",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "NeoB uptake imaging data not available."
+      "reason": "No NeoB PET imaging or organ involvement data in profile."
      },
      {
       "text": "If there is liver disease involvement (in the absence of lung involvement), in ≥ 50% of all CT measurable liver lesions (RECIST 1.1)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Liver lesion uptake not assessed."
+      "reason": "No liver lesion uptake data available."
      },
      {
       "text": "If there is lung disease involvement (in the absence of liver involvement), in ≥ 50% of all CT measurable lung lesions (RECIST 1.1)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Lung lesion uptake not assessed."
+      "reason": "No lung lesion uptake data available."
      },
      {
       "text": "Participants with both liver and lung disease involvement must show \\[68Ga\\]Ga-NeoB uptake above the liver in ≥ 50% of all CT measurable lesions either in liver or lung (RECIST 1.1) and in at least one measurable lesion in the remaining organ (lung or liver) 9a. Participants with central nervous system (CNS) involvement are eligible provided that they meet ALL the following criteria:",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Combined liver/lung uptake not assessed."
+      "reason": "No combined liver/lung involvement data available."
      },
      {
       "text": "At least 2 weeks from prior therapy completion (including radiation and/or surgery) to initiation of the study treatment",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "CNS therapy timing not documented."
+      "reason": "No CNS involvement or therapy timing data reported."
      },
      {
       "text": "Clinically stable CNS tumor at the time of screening",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "CNS stability not documented."
+      "reason": "No CNS tumor stability data reported."
      },
      {
       "text": "Participant is not receiving steroids and/or anti-epileptic medications for brain metastases at the time of initiation of the radioligand study treatment 10. Participant has an Eastern Cooperative Oncology Group (ECOG) performance status of 0 or 1. 11a. Participant has adequate bone marrow and organ function as defined by the following laboratory values (as assessed by local laboratory):",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Steroid/anti-epileptic use not documented."
+      "reason": "No steroid/anti-epileptic medication data reported."
      },
      {
       "text": "Absolute neutrophil count ≥ 1.5 × 109/L",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Neutrophil count not provided."
+      "reason": "No neutrophil count reported."
      },
      {
       "text": "Platelets ≥ 100 × 109/L",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Platelet count not provided."
+      "reason": "No platelet count reported."
      },
      {
       "text": "Hemoglobin ≥ 9.0 g/dL",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Hemoglobin not provided."
+      "reason": "No hemoglobin value reported."
      },
      {
       "text": "International Normalized Ratio (INR) ≤1.5",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "INR not provided."
+      "reason": "No INR value reported."
      },
      {
       "text": "Estimated glomerular filtration rate (eGFR) ≥ 60 ml/min/1.73m2 using the Chronic Kidney Disease Epidemiology Collaboration (CKD-EPI) equation",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "eGFR not provided."
+      "reason": "No eGFR value reported."
      },
      {
       "text": "Total bilirubin (TBIL) \\< 1.5 × ULN (any elevated bilirubin should be asymptomatic at enrollment) except for participants with Gilbert's syndrome who may only be included if the total bilirubin is ≤ 3.0 × ULN or direct bilirubin ≤ 1.5 × ULN",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Bilirubin not provided."
+      "reason": "No bilirubin value reported."
      },
      {
       "text": "In absence of liver metastases, alanine aminotransferase (ALT) and aspartate aminotransferase (AST) \\< 2.5 × ULN. If the participant has liver metastases, the participant will be eligible for the study if ALT and AST \\< 5 X ULN.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "ALT/AST not provided."
+      "reason": "No ALT/AST values reported."
      },
      {
       "text": "Serum lipase ≤ 1.5 × ULN Note: no platelet transfusion, packed red blood cell transfusion, or G-CSF will be allowed during the screening phase after ICF signature",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Serum lipase not provided."
+      "reason": "No serum lipase value reported."
      },
      {
       "text": "Participant must have the following laboratory values within normal limits or corrected to within normal limits with supplements before the first dose of study medication:",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Electrolyte values not provided."
+      "reason": "No electrolyte values reported."
      },
      {
       "text": "Potassium",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Potassium not provided."
+      "reason": "No potassium value reported."
      },
      {
       "text": "Magnesium",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Magnesium not provided."
+      "reason": "No magnesium value reported."
      },
      {
       "text": "Total Calcium (corrected for serum albumin) 12. Participant must be able to swallow capecitabine tablets. 13. Participant must be able to communicate with the investigator and comply with the requirements of the study procedures. 14a. For Phase I part and Standalone Japanese cohort only Female participant must be in postmenopausal status at the time of starting study treatment. Postmenopausal status is defined by any of the following (NCCN 2024):",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Calcium not provided."
+      "reason": "No calcium value reported."
      },
      {
       "text": "Prior surgical bilateral oophorectomy (with or without hysterectomy)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Oophorectomy status not documented."
+      "reason": "No oophorectomy history reported."
      },
      {
       "text": "Age ≥ 60 years",
       "kind": "INCLUSION",
       "verdict": "NOT_MET",
-      "reason": "Patient is 54, under 60."
+      "reason": "Patient is 54, under the age 60 threshold."
      },
      {
       "text": "Age \\< 60 years and ≥ 12 months of natural (spontaneous) amenorrhea in the absence of chemotherapy, tamoxifen, toremifene, or ovarian suppression with serum Follicle-Stimulating Hormone (FSH) and estradiol in the postmenopausal range per local normal range.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Amenorrhea/FSH status not documented."
+      "reason": "No amenorrhea or FSH/estradiol data reported."
      },
      {
       "text": "Aged \\< 60 years: chemotherapy-induced amenorrhea for ≥ 12 months with serial measurements of FSH and estradiol in post-menopausal ranges (NCCN V4 2023).",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Chemo-induced amenorrhea status not documented."
+      "reason": "No chemotherapy-induced amenorrhea data reported."
      },
      {
       "text": "Aged \\< 60 years: on tamoxifen with serial measurements of FSH and estradiol in post-menopausal ranges Note: Ovarian radiation or treatment with a gonadotropin releasing hormone agonist (GnRHas e.g. goserelin acetate) is not permitted for induction of ovarian suppression in the Phase I part. Male participants, provided that they do not require continued GnRHas while on study treatment 15a. For Phase II part only",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Tamoxifen/hormone status not documented."
+      "reason": "No tamoxifen or hormonal status data reported."
      },
      {
       "text": "Female participant is post-menopausal as per criteria above at the time of starting study treatment. OR • Female participant is pre/peri-menopausal at the time of starting study treatment Pre-menopausal status is defined as either:",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Menopausal status not documented."
+      "reason": "No menopausal status reported (Phase II option)."
      },
      {
       "text": "Patient had last menstrual period within the last 12 months OR",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Menstrual history not documented."
+      "reason": "No last menstrual period data reported."
      },
      {
       "text": "If on tamoxifen or toremifene within the past 14 days, FSH and estradiol in pre-menopausal ranges on serial measurements OR",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Tamoxifen/hormone status not documented."
+      "reason": "No tamoxifen/FSH data reported."
      },
      {
       "text": "In case of therapy induced amenorrhea, FSH and estradiol in pre-menopausal ranges on serial measurements Note: Peri-menopausal status is defined as neither pre-menopausal nor post-menopausal (see definition above)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Amenorrhea hormone status not documented."
+      "reason": "No therapy-induced amenorrhea data reported."
      },
      {
       "text": "Male participants, regardless of their need of GnRHas while on study treatment.",
       "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Patient is female, not applicable."
+      "verdict": "MET",
+      "reason": "Patient is female; male-specific criterion not applicable."
      },
      {
       "text": "1\\. Participant with symptomatic visceral disease or any disease burden that are at risk of life-threatening complications as per the investigator's judgment. 2a. Participant has received \\>1 prior treatment with chemotherapy and/or Antibody Drug-Conjugates (ADCs) in the metastatic setting. Chemotherapy in neoadjuvant/ adjuvant setting is not considered a line of therapy, unless progression or recurrence occurred during or within 12 months after completion of adjuvant chemotherapy. 3\\. Participant has received prior treatment with capecitabine. 4. History of hypersensitivity or contraindication to any of the study treatments or their excipients or to drugs of similar chemical classes. 5\\. Participant has inflammatory breast cancer at screening. 6. Participant has had major surgery within 14 days prior to starting study treatment or has not recovered from major side effects. 7\\. Participant has received any prior treatment with a therapeutic radiopharmaceutical. 8\\. Prior External Beam Radiation Therapy (EBRT) to more than 25% of the bone marrow. 9\\. Participant has a concurrent malignancy or malignancy within 3 years of start of study treatment, with the exception of adequately treated, basal or squamous cell carcinoma, non-melanomatous skin cancer, or curatively resected cervical cancer. 10\\. Participant has impairment of gastrointestinal (GI) function or GI disease that may significantly alter the absorption of the study drugs (e.g., uncontrolled ulcerative diseases, uncontrolled nausea, vomiting, diarrhoea, malabsorption syndrome, or small bowel resection) based on investigator's discretion. 11\\. Participant has any other concurrent severe and/or uncontrolled medical condition that would, in the investigator's judgment, cause unacceptable safety risks, contraindicate participant participation in the clinical study or compromise compliance with the protocol (e.g., chronic pancreatitis, chronic active hepatitis, active untreated or uncontrolled fungal, bacterial or viral infections, interstitial lung disease (ILD)/ pneumonitis etc.). 12\\. Participant has a history of or ongoing acute pancreatitis within 1 year of screening. 13\\. History or current diagnosis of impaired cardiac function, clinically significant cardiac disease or ECG abnormalities indicating significant risk of safety for participants in the study such as:",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Symptomatic visceral/chemo line history not documented."
+      "reason": "No data on symptomatic visceral disease burden."
      },
      {
       "text": "Documented myocardial infarction (MI), angina pectoris, cardiomyopathy, symptomatic pericarditis, or coronary artery bypass graft (CABG) within 6 months prior to study entry",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Cardiac history not documented."
+      "reason": "No cardiac history reported."
      },
      {
       "text": "Clinically significant cardiac arrhythmias (e.g., ventricular tachycardia), complete left bundle branch block, high-grade atrioventricular (AV) block (e.g., bifascicular block, Mobitz type II and third-degree AV block)",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Arrhythmia history not documented."
+      "reason": "No arrhythmia data reported."
      },
      {
       "text": "Long QT syndrome or family history of idiopathic sudden death or congenital long QT syndrome, or any of the following:",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Long QT history not documented."
+      "reason": "No long QT or family history data reported."
      },
      {
       "text": "Risk factors for TdP including uncorrected hypocalcemia, hypokalemia or hypomagnesemia, history of cardiac failure, or history of clinically significant/symptomatic bradycardia",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "TdP risk factors not documented."
+      "reason": "No TdP risk factor data reported."
      },
      {
       "text": "Inability to determine the Fridericia QT correction formula (QTcF) interval",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "QTcF measurement not available."
+      "reason": "No ECG/QTcF data reported."
      },
      {
       "text": "Resting QTcF ≥450 msec (male) or ≥460 msec (female) at screening as per standard 12-lead ECG values defined as the mean of the triplicate ECGs and assessed locally",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "QTcF value not provided."
+      "reason": "No QTcF measurement reported."
      },
      {
       "text": "Left Ventricular Ejection Fraction (LVEF) \\< 50% as determined by echocardiogram (ECHO) or MUGA.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "LVEF not provided."
+      "reason": "No LVEF value reported."
      },
      {
       "text": "Uncontrolled hypertension defined by a Systolic Blood Pressure (SBP) ≥ 160 mmHg and/or Diastolic Blood Pressure (DBP) ≥ 100 mm Hg, with or without anti-hypertensive medication. 14\\. Participant is currently receiving brivudine which cannot be discontinued at least 4-week prior to start of capecitabine therapy. 15a. Participant is currently receiving NEP inhibitors (i.e., Entresto®, racecadotril) and images for dosimetry assessments cannot be acquired for this participant as per Section 8.7.3. 16b. Participant with known deficiency or family history of deficiency of dihydropyrimidine dehydrogenase. 17\\. Participant participated in a prior investigational study within 30 days prior to start of study treatment, or within 5 half-lives of the investigational product, whichever is longer; or as required by local regulations. 18\\. Sexually active male participants unwilling to:",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Blood pressure not provided."
+      "reason": "No blood pressure data reported."
      },
      {
       "text": "remain abstinent (refrain from sexual intercourse) or",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Patient is female, abstinence requirement not applicable."
+      "verdict": "MET",
+      "reason": "Male abstinence requirement not applicable to female patient."
      },
      {
       "text": "use a condom, while taking study treatment and for at least 4 months after the last administration of \\[177Lu\\]Lu-NeoB, or 3 months after the last dose of capecitabine (or as per locally prescribing information) whichever is longer, in addition to the highly effective method used by the partner who is a female of child-bearing potential. Note: A condom is required for all sexually active male participants to prevent them from fathering a child and to prevent delivery of study treatment via seminal fluid to their partner. In addition, male participants must not donate sperm for the time period specified above. 19\\. Participants with legal incapacity to give informed consent, where required by local regulation (e.g. in EU). 20a. For Phase II part only",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Male contraception requirement not applicable."
+      "verdict": "MET",
+      "reason": "Male condom requirement not applicable to female patient."
      },
      {
       "text": "Pregnant or breast-feeding women",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Pregnancy status not documented."
+      "reason": "No pregnancy/breastfeeding status reported."
      },
      {
       "text": "Women of childbearing potential, defined as all women physiologically capable of becoming pregnant, are not allowed to participate in this study UNLESS they are using highly effective methods of contraception throughout the study and for up to 7 months after the last administration of \\[177Lu\\]Lu-NeoB or 6 months after the last dose of capecitabine (or as per locally prescribing information) whichever is longer. Highly effective contraception methods include:",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Childbearing potential/contraception not documented."
+      "reason": "No contraception/childbearing potential data reported."
      },
      {
       "text": "Total abstinence (when this is in line with the preferred and usual lifestyle of the subject). Periodic abstinence (e.g., calendar, ovulation, symptothermal, post-ovulation methods) and withdrawal are not acceptable methods of contraception.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Contraception method not documented."
+      "reason": "No contraception method data reported."
      },
      {
       "text": "Bilateral oophorectomy with or without hysterectomy, total hysterectomy, or bilateral salpingectomy at least six weeks before taking study treatment. In case of oophorectomy alone, only when the reproductive status of the woman has been confirmed by follow up hormone level assessment are they not considered to be of childbearing potential.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Surgical sterilization status not documented."
+      "reason": "No surgical sterilization history reported."
      },
      {
       "text": "Bilateral tubal occlusion, Bilateral tubal ligation (at least six weeks before taking study treatment)..",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Tubal status not documented."
+      "reason": "No tubal occlusion history reported."
      },
      {
       "text": "Sterilization (vasectomy) of male partner(s) of the female participant at least 6 months prior to screening provided partner(s) has(have) received medical assessment of the surgical success.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Partner vasectomy not documented."
+      "reason": "No partner vasectomy data reported."
      },
      {
       "text": "Placement of an intrauterine device (IUD) and concurrent use of barrier methods of contraception: condom or occlusive cap (diaphragm or cervical/vault caps) with spermicidal foam/gel/film/cream/vaginal suppository. If local regulations deviate from the recommendations provided above, local regulations apply and will be described in the ICF. Women are considered not of child-bearing potential if they are post- menopausal or have had surgical bilateral oophorectomy (with or without hysterectomy), bilateral salpingectomy or total hysterectomy at least six weeks prior to enrollment on study. In the case of oophorectomy alone, only when the reproductive status of the woman has been confirmed by follow-up hormone level assessment is she considered to be not of child-bearing potential. Note: Use of oral (estrogen and progesterone), injected or implanted hormonal methods of contraception or intrauterine system (IUS) or any other form of hormonal contraception for example hormone vaginal ring, or transdermal hormone contraception is not allowed in this study. 21.Participants taking prohibited therapies as listed in Section 6.8.2",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "IUD/barrier use not documented."
+      "reason": "No IUD/barrier contraception data reported."
+     },
+     {
+      "text": "Signed informed consent must be obtained prior to participation in the study.",
+      "kind": "INCLUSION",
+      "verdict": "UNKNOWN",
+      "reason": "Not evaluated."
      }
     ]
    }
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT07524322 — Study of RGT-490 in Patients With PIK3CA-Mutated Advanced Solid Tumors"
   },
   {
    "type": "evaluating",
    "nctId": "NCT07524322"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT07524322",
+   "title": "Study of RGT-490 in Patients With PIK3CA-Mutated Advanced Solid Tumors"
+  },
+  {
+   "type": "thinking",
+   "delta": "Looking at the trial eligibility criteria, this patient has a mismatch on two key fronts: the trial requires PIK3CA mutation but there's no documented mutation for this patient, and while they're HER2-positive, the expansion cohort is specifically for HR+/HER2- disease. I'm also trying to clarify whether the patient's cancer is metastatic or locally advanced, since that affects the first inclusion criterion about prior progression on therapy.\n\nThe dose escalation cohort could potentially accommodate any advanced solid tumor with PIK3CA mutation, which means the HER2+ status might not be a barrier there—but the missing PIK3CA mutation status is the critical blocker. Several other criteria remain unknown: measurable disease, ECOG performance status, organ function, and washout periods from prior treatments. The exclusion criteria mostly appear to be met based on what's documented, but without the PIK3CA mutation confirmation, this is a near miss for eligibility.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT07524322",
+   "status": "NEAR_MISS"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT07524322",
    "verdict": {
     "status": "NEAR_MISS",
-    "summary": "This trial requires a documented PIK3CA mutation, which your profile does not yet report — confirming your tumor's PIK3CA status is the key next step. Note the breast-cancer expansion cohort is HER2-negative, but you may fit the Phase 1 dose-escalation arm for any PIK3CA-mutated solid tumor if your tumor carries that mutation. Several details (disease stage, ECOG, labs, recent treatment timing) are missing, so the trial site would need to confirm your eligibility.",
+    "summary": "Your HER2-positive breast cancer could potentially fit the Phase 1 dose-escalation arm, which accepts any advanced solid tumor — but only if your tumor carries a PIK3CA mutation, which is not documented in your profile. (The HR+/HER2- expansion arm does not fit since you are HER2-positive.) Whether you qualify hinges on PIK3CA testing and confirmation of advanced/metastatic disease; the study site would confirm these details.",
     "criteria": [
      {
       "text": "Adults with metastatic or locally advanced, unresectable solid tumors that have progressed on or after at least one available therapy.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Profile doesn't confirm metastatic/locally advanced unresectable disease or progression after prior therapy"
+      "reason": "Prior trastuzumab/paclitaxel suggest treated disease, but metastatic/unresectable status not confirmed in profile."
      },
      {
       "text": "Presence of one or more documented activating PIK3CA mutation in tumor tissue and/or blood.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No PIK3CA mutation status reported; testing required to confirm this key criterion"
+      "reason": "Required PIK3CA activating mutation not documented; this is the pivotal eligibility factor."
      },
      {
       "text": "At least 1 measurable lesion or evaluable disease per RECIST v1.1.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Measurable/evaluable disease per RECIST not documented"
+      "reason": "Measurable/evaluable disease per RECIST not stated."
      },
      {
       "text": "An ECOG performance status of 0 or 1.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "ECOG performance status not provided"
+      "reason": "ECOG performance status not provided."
      },
      {
       "text": "Adequate organ function",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Organ function labs not provided"
+      "reason": "Organ function labs not provided."
      },
      {
       "text": "Diabetes mellitus requiring anti-hyperglycemic medication.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No information on diabetes or anti-hyperglycemic medication"
+      "reason": "No diabetes or anti-hyperglycemic medication reported, but not explicitly confirmed."
      },
      {
       "text": "Prior treatment with PI3Kα inhibitors",
       "kind": "EXCLUSION",
       "verdict": "MET",
-      "reason": "No prior PI3Kα inhibitor; prior therapy was trastuzumab and paclitaxel"
+      "reason": "No prior PI3Kα inhibitor listed; only trastuzumab and paclitaxel."
      },
      {
       "text": "Symptomatic, untreated, or uncontrolled central nervous system metastases.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No information on CNS metastases status"
+      "reason": "CNS metastasis status not reported."
      },
      {
       "text": "Receipt of any local or systemic anticancer therapy or investigational anticancer agent within a protocol-defined washout period prior to study treatment.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Timing of last anticancer therapy relative to washout not provided"
+      "reason": "Timing of last anticancer therapy relative to washout window unknown."
      },
      {
       "text": "Unresolved clinically significant toxicities from prior anticancer therapy",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No information on unresolved toxicities from prior therapy"
+      "reason": "Unresolved toxicities from prior therapy not documented."
      },
      {
       "text": "History of a another malignancy within 2 years prior to screening (exception adequately treated cancers).",
       "kind": "EXCLUSION",
       "verdict": "MET",
-      "reason": "No other malignancy reported within prior 2 years"
-     }
-    ]
-   }
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT07368998 — To Study the Effect of Inavolisib in Combination With Fulvestrant in Participant"
-  },
-  {
-   "type": "evaluating",
-   "nctId": "NCT07368998"
-  },
-  {
-   "type": "verdict",
-   "nctId": "NCT07368998",
-   "verdict": {
-    "status": "EXCLUDED",
-    "summary": "This trial is for HER2-negative, ER-positive breast cancer, but your profile shows HER2-positive disease, which is a fundamental mismatch with the main eligibility requirement. The trial also requires prior CDK4/6 inhibitor plus endocrine therapy and a PIK3CA mutation, which are not documented in your profile. The trial site makes the final eligibility decision, but based on this information you do not appear to qualify.",
-    "criteria": [
-     {
-      "text": "Documented ER +/ HER2- tumor according to American Society of Clinical Oncology/College of American Pathologists (ASCO/CAP) guidelines",
-      "kind": "INCLUSION",
-      "verdict": "NOT_MET",
-      "reason": "Trial requires HER2-negative tumor; patient is HER2-positive"
-     },
-     {
-      "text": "Disease progression after or during treatment with a combination of CDK4/6i and endocrine therapy: \\<= 1 prior lines of systemic therapy in the locally advanced (recurrent or progressed) or metastatic setting",
-      "kind": "INCLUSION",
-      "verdict": "NOT_MET",
-      "reason": "No prior CDK4/6 inhibitor plus endocrine therapy documented; patient had trastuzumab and paclitaxel"
-     },
-     {
-      "text": "Measurable or evaluable disease per Response Evaluation Criteria in Solid Tumors version 1.1 (RECIST v1.1)",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Measurable/evaluable disease status not specified in profile"
-     },
-     {
-      "text": "Participants for whom endocrine-based therapy is recommended and treatment with cytotoxic chemotherapy is not indicated at time of entry into the study, as per national or local treatment guidelines",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Suitability for endocrine therapy not documented"
-     },
-     {
-      "text": "Confirmation of biomarker eligibility: presence of \\>= 1 study-eligible PIK3CA mutation",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "PIK3CA mutation status not reported"
-     },
-     {
-      "text": "Life expectancy of \\> 6 months",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Life expectancy not documented"
-     },
-     {
-      "text": "Ability, in the investigator's judgment, and willingness to comply with all study -related procedures, including completion of patient-reported outcomes",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Ability to comply with procedures not assessed"
-     },
-     {
-      "text": "Metaplastic breast cancer",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No metaplastic breast cancer noted"
-     },
-     {
-      "text": "Prior treatment with chemotherapy in the recurrent locally advanced/metastatic setting",
-      "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Setting of prior paclitaxel (metastatic vs early) not specified"
-     },
-     {
-      "text": "Type 2 diabetes requiring ongoing systemic treatment at the time of study entry; or any history of Type 1 diabetes",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No diabetes history reported"
-     },
-     {
-      "text": "Prior treatment with PI3K/Akt/mTOR inhibitors in the recurrent locally advanced/metastatic setting",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No prior PI3K/Akt/mTOR inhibitor reported"
-     },
-     {
-      "text": "Requirement for daily supplemental oxygen",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No supplemental oxygen requirement noted"
-     },
-     {
-      "text": "Symptomatic active lung disease, including pneumonitis",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No active lung disease or pneumonitis reported"
+      "reason": "No other malignancy within 2 years reported."
      }
     ]
    }
   },
   {
    "type": "thinking",
-   "delta": "I've identified a few trials that came close but didn't quite fit the criteria—a couple with HER2-negative status that I had to exclude. Now I'm looking at what unknowns remain to figure out which questions would be most valuable to investigate further."
+   "delta": "I'm looking through the unknowns to identify which question would yield the most value, focusing on trials that require measurable lesion data, progression status, and metastatic confirmation."
   },
   {
    "type": "tool",
    "name": "reviewUnknowns",
-   "detail": "Reviewing 25 open unknowns across 3 in-play trials"
+   "detail": "Reviewing 28 open unknowns across 3 in-play trials"
   },
   {
    "type": "thinking",
-   "delta": "Looking at what's common across these three trials, I see that measurable disease by RECIST criteria, CNS or brain metastasis status, and ECOG performance score all appear consistently. Brain metastasis exclusion is particularly notable since it shows up in all three trials and is something a patient's caregiver would likely already know about—whether the cancer has spread to the brain. The measurable disease and ECOG criteria are more technical in nature, but brain metastasis status stands out as both a high-value exclusion criterion and something reasonably accessible to the patient or caregiver."
+   "delta": "The key insight is that disease progression on the most recent treatment is the most universally knowable fact across these trials—something a patient or caregiver could reasonably track without clinical expertise. This appears consistently, including in NCT07299825, making it a critical eligibility marker."
   },
   {
    "type": "ask",
-   "question": "Has Maria's cancer spread to her brain or spinal cord (brain metastases), as far as you know? And if so, is it currently being treated and stable?"
+   "question": "Has Maria's cancer grown or gotten worse during or after her most recent treatment (in other words, did the trastuzumab/paclitaxel stop working)?"
   },
   {
    "type": "userMessage",
@@ -10630,156 +10578,176 @@
   },
   {
    "type": "thinking",
-   "delta": "Now that I know there are no brain metastases, that opens up the eligibility for all three trials. The patient is still on trastuzumab and had their last paclitaxel dose two weeks ago, so the washout period is relevant for NCT07524322. Let me reconsider those three near-misses with this new information."
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT05150691 — A Phase 1/2a Study of DB-1303/BNT323 in Advanced/Metastatic Solid Tumors"
+   "delta": "She finished paclitaxel two weeks ago and is still on trastuzumab, with no brain metastases—so the recent treatment timing could affect trial washout requirements, and at least the CNS status is now clear. I should reconsider those near-miss trials with this updated information."
   },
   {
    "type": "evaluating",
    "nctId": "NCT05150691"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT05150691",
+   "title": "A Phase 1/2a Study of DB-1303/BNT323 in Advanced/Metastatic Solid Tumors"
+  },
+  {
+   "type": "thinking",
+   "delta": "The patient has HER2-positive, ER-positive breast cancer with prior exposure to trastuzumab and paclitaxel, which aligns with this trial for HER2-positive advanced solid tumors—there are specific breast cancer expansion cohorts available. I need to verify whether the disease is metastatic and refractory to standard treatment, since the profile indicates HER2-positive breast cancer but doesn't explicitly confirm advanced or metastatic status.\n\nThe prior trastuzumab and paclitaxel strongly suggest advanced disease, though I'm missing key clinical details like measurable lesions, ECOG performance status, and LVEF. Given the treatment history, I'll mark this as likely metastatic, though I should note the uncertainty since \"advanced/metastatic\" isn't explicitly documented. Let me work through the inclusion criteria now.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT05150691",
+   "status": "NEAR_MISS"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT05150691",
    "verdict": {
     "status": "NEAR_MISS",
-    "summary": "Your HER2-positive breast cancer and documented HER2 status fit this trial's core requirements, and your prior trastuzumab/paclitaxel is consistent with the eligible population. Several items — measurable disease, ECOG status, heart function (LVEF), and lab results — are not in your profile and would need testing to confirm eligibility. The trial site makes the final determination.",
+    "summary": "This first-in-human ADC study enrolls HER2-positive advanced solid tumors, and your HER2-positive breast cancer with prior trastuzumab and paclitaxel fits a likely breast cohort. However, the profile lacks the staging, performance status, cardiac, organ-function and imaging details the trial requires, so eligibility cannot be confirmed without site workup. The disease and biomarker match are encouraging.",
     "criteria": [
      {
       "text": "Has a pathologically documented HER2-positive or HER2-expressing (except for cohort 2h where the requirement is HER2-null), advanced/unresectable, recurrent, or metastatic malignant solid tumor that is refractory to or intolerable with standard treatment, or for which no standard treatment is available.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "HER2-positive breast cancer with prior trastuzumab/paclitaxel, consistent with advanced refractory disease"
+      "reason": "HER2-positive tumor; prior trastuzumab/paclitaxel implies advanced disease beyond standard therapy."
      },
      {
       "text": "At least 1 measurable lesion (per RECIST 1.1)",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No measurable lesion data in profile"
+      "reason": "No imaging data on a measurable RECIST 1.1 lesion in the profile."
      },
      {
       "text": "Provide signed informed consent",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Consent not documented"
+      "reason": "Consent status not documented."
      },
      {
       "text": "ECOG performance status (PS) of 0-1.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "ECOG performance status not reported"
+      "reason": "ECOG performance status not reported."
      },
      {
       "text": "LVEF ≥ 50% by ECHO or MUGA",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "LVEF not reported"
+      "reason": "No LVEF/ECHO/MUGA result provided."
      },
      {
       "text": "Adequate organ functions",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Organ function labs not provided"
+      "reason": "Organ function labs not in profile."
      },
      {
       "text": "Provide pre-existing diagnosis of HER2 status or resected tumor samples or undergo fresh tumor biopsy for HER2 testing.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "HER2-positive status documented in biomarkers"
+      "reason": "Pre-existing HER2-positive diagnosis available."
      },
      {
       "text": "Life expectancy of ≥ 3 months. Additional for Part 2 Expansion Group 9: 1\\. Has pathologically documented advanced/unresectable, recurrent, or metastatic EC (including UCS and USPC) and has progressed on or after at least 1 line of systemic treatment including platinum-based therapy and exposure to ICI but no more than prior 3 lines of therapy for advanced/unresectable, or metastatic disease. Note: endocrine therapy will not qualify as a systemic therapy line.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Life expectancy not stated"
+      "reason": "Life expectancy not documented."
      },
      {
       "text": "History of symptomatic CHF (New York Heart Association \\[NYHA\\] classes II-IV) or serious cardiac arrhythmia requiring treatment.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No cardiac history reported"
+      "reason": "No cardiac history (CHF/arrhythmia) reported."
      },
      {
       "text": "History of myocardial infarction or unstable angina within 6 months before Day 1.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No MI/angina history reported"
+      "reason": "No MI/unstable angina history documented."
      },
      {
       "text": "Average QTcF \\> 450 ms in males and \\> 470 ms in females",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "QTcF not reported"
+      "reason": "QTcF value not provided."
      },
      {
       "text": "History of clinically significant lung diseases",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No lung disease history reported"
+      "reason": "Lung disease history not documented."
      },
      {
       "text": "Uncontrolled infection requiring IV antibiotics, antivirals, or antifungals.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No infection status reported"
+      "reason": "Infection status unknown."
      },
      {
       "text": "HIV infection with AIDS defining illness or active viral hepatitis.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "HIV/hepatitis status not reported"
+      "reason": "HIV/hepatitis status not reported."
      },
      {
       "text": "Clinically active brain metastases",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Brain metastasis status not reported"
+      "reason": "Brain metastasis status not documented."
      },
      {
       "text": "Unresolved toxicities from previous anticancer therapy, defined as toxicities not yet resolved to NCI-CTCAE version 5.0, Grade ≤ 1 or baseline.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Residual toxicities from prior therapy not reported"
+      "reason": "Unresolved prior-therapy toxicities not described."
      },
      {
       "text": "A known hypersensitivity to either the drug substances or inactive ingredients in the drug product.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Hypersensitivity history not reported"
+      "reason": "No hypersensitivity history available."
      },
      {
       "text": "Part 2 (expansion) Only:Multiple primary malignancies within 3 years, except adequately resected non- melanoma skin cancer, curatively treated in-situ disease, other solid tumors curatively treated, or contralateral breast cancer.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No data on other malignancies"
+      "reason": "No data on other primary malignancies within 3 years."
      }
     ]
    }
-  },
-  {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT07299825 — A Study of A166 in Patients With HER2-Positive Unresectable or Metastatic Breast"
   },
   {
    "type": "evaluating",
    "nctId": "NCT07299825"
   },
   {
+   "type": "analystStart",
+   "nctId": "NCT07299825",
+   "title": "A Study of A166 in Patients With HER2-Positive Unresectable or Metastatic Breast Cancer"
+  },
+  {
+   "type": "thinking",
+   "delta": "Looking at the inclusion criteria, the patient doesn't meet requirement 3 since they never received a HER2-targeted antibody-drug conjugate with a topoisomerase inhibitor payload like trastuzumab deruxtecan—they only had trastuzumab and paclitaxel. The first two criteria are satisfied: age 54 falls within the 18-75 range, and the HER2-positive breast cancer is documented.\n\nFor the remaining inclusion criteria, disease progression and measurable lesions are unknown from the available information. On the exclusion side, most criteria appear met (no prior A166 or HER2 ADC with microtubule inhibitor, no documented hypersensitivity, no corneal disease or CNS metastases), though the reason for any trastuzumab discontinuation is unclear. This missing prior ADC therapy represents a fundamental treatment-history mismatch—the patient hasn't received the required prior therapy, though they could potentially become eligible if they receive such treatment in the future. I'd classify this as a near-miss rather than a complete exclusion.",
+   "agent": "analyst"
+  },
+  {
+   "type": "analystEnd",
+   "nctId": "NCT07299825",
+   "status": "NEAR_MISS"
+  },
+  {
    "type": "verdict",
    "nctId": "NCT07299825",
    "verdict": {
     "status": "NEAR_MISS",
-    "summary": "Your profile matches the age, diagnosis, and treatment-history basics for this HER2-positive breast cancer trial, but the study requires prior treatment with a specific HER2 antibody-drug conjugate carrying a topoisomerase inhibitor payload, which your listed therapies (trastuzumab and paclitaxel) do not include. Several details — disease progression, measurable lesions, and other history — are also not documented. The trial site would confirm whether your full treatment history and current status meet all requirements.",
+    "summary": "Your age and HER2-positive breast cancer fit this trial, but it requires that you have already received a HER2 antibody-drug conjugate with a topoisomerase-inhibitor payload (such as trastuzumab deruxtecan). Your recorded prior treatments are only trastuzumab and paclitaxel, so you do not currently meet that requirement. If you later receive such therapy, eligibility could change — the study site can confirm your full treatment history.",
     "criteria": [
      {
       "text": "Male or female patient ≥ 18 years and ≤ 75 years when signing the informed consent form.",
       "kind": "INCLUSION",
       "verdict": "MET",
-      "reason": "Age 54 is within the 18-75 range."
+      "reason": "Age 54 is within the 18–75 range."
      },
      {
       "text": "Breast cancer patients by histopathology and/or cytology documented.",
@@ -10791,19 +10759,19 @@
       "text": "In the advanced or metastatic stage, having received no more than 5 lines of systemic therapy, one of which must include a HER2 ADC with a topoisomerase inhibitor payload.",
       "kind": "INCLUSION",
       "verdict": "NOT_MET",
-      "reason": "Prior therapy is trastuzumab and paclitaxel only; no HER2 ADC with topoisomerase inhibitor payload received."
+      "reason": "Prior therapy lists only trastuzumab and paclitaxel; no HER2 ADC with topoisomerase inhibitor payload (e.g., T-DXd)."
      },
      {
       "text": "Patients must have experienced disease progression or intolerance during or after the most recent treatment prior to randomization.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Profile does not state progression or intolerance on most recent treatment."
+      "reason": "No information on progression or intolerance after last therapy."
      },
      {
       "text": "At least one measurable lesion according to RECIST 1.1 criteria.",
       "kind": "INCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "No information on measurable lesions per RECIST 1.1."
+      "reason": "No data on measurable RECIST 1.1 lesions."
      },
      {
       "text": "Previous treatment with A166 or any HER2-targeted antibody-drug conjugate (ADC) with a microtubule inhibitor payload.",
@@ -10814,26 +10782,26 @@
      {
       "text": "Known history of severe hypersensitivity to other monoclonal antibodies, or allergy to A166 or their components.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No hypersensitivity history provided."
+      "verdict": "MET",
+      "reason": "No history of monoclonal antibody hypersensitivity reported."
      },
      {
       "text": "Permanent discontinuation of trastuzumab or its biosimilars due to any toxicity in prior treatments.",
       "kind": "EXCLUSION",
       "verdict": "UNKNOWN",
-      "reason": "Reason for stopping trastuzumab not documented."
+      "reason": "Patient received trastuzumab; reason for stopping not stated."
      },
      {
       "text": "Presence of severe corneal epithelial disease at baseline; or inability to perform daily activities without contact lenses.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on corneal disease."
+      "verdict": "MET",
+      "reason": "No corneal disease reported."
      },
      {
       "text": "Presence of spinal cord compression or clinically active central nervous system (CNS) metastases.",
       "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on CNS metastases or spinal cord compression."
+      "verdict": "MET",
+      "reason": "No CNS metastases or spinal cord compression reported."
      },
      {
       "text": "Other conditions considered by the investigator to make the patient unsuitable for participation in the study.",
@@ -10845,103 +10813,8 @@
    }
   },
   {
-   "type": "tool",
-   "name": "evaluateTrial",
-   "detail": "Evaluating NCT07524322 — Study of RGT-490 in Patients With PIK3CA-Mutated Advanced Solid Tumors"
-  },
-  {
-   "type": "evaluating",
-   "nctId": "NCT07524322"
-  },
-  {
-   "type": "verdict",
-   "nctId": "NCT07524322",
-   "verdict": {
-    "status": "NEAR_MISS",
-    "summary": "This trial requires a documented PIK3CA mutation, which is not in your profile, so a tumor test would be needed to know if you qualify. The dose-escalation cohort accepts any PIK3CA-mutated solid tumor, though the breast-cancer expansion cohort is for HER2-negative patients and you are HER2-positive. Several details (PIK3CA status, disease stage, ECOG, labs) are missing — the trial site would confirm final eligibility.",
-    "criteria": [
-     {
-      "text": "Adults with metastatic or locally advanced, unresectable solid tumors that have progressed on or after at least one available therapy.",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Has prior trastuzumab/paclitaxel but profile doesn't confirm metastatic/locally advanced unresectable status or progression."
-     },
-     {
-      "text": "Presence of one or more documented activating PIK3CA mutation in tumor tissue and/or blood.",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "PIK3CA mutation status not documented in profile; required for enrollment."
-     },
-     {
-      "text": "At least 1 measurable lesion or evaluable disease per RECIST v1.1.",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on measurable or evaluable disease per RECIST."
-     },
-     {
-      "text": "An ECOG performance status of 0 or 1.",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "ECOG performance status not reported."
-     },
-     {
-      "text": "Adequate organ function",
-      "kind": "INCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Organ function labs not provided."
-     },
-     {
-      "text": "Diabetes mellitus requiring anti-hyperglycemic medication.",
-      "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No diabetes information in profile."
-     },
-     {
-      "text": "Prior treatment with PI3Kα inhibitors",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No prior PI3Kα inhibitor listed; only trastuzumab and paclitaxel."
-     },
-     {
-      "text": "Symptomatic, untreated, or uncontrolled central nervous system metastases.",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No CNS metastases reported."
-     },
-     {
-      "text": "Receipt of any local or systemic anticancer therapy or investigational anticancer agent within a protocol-defined washout period prior to study treatment.",
-      "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "Timing of prior therapy relative to washout not provided."
-     },
-     {
-      "text": "Unresolved clinically significant toxicities from prior anticancer therapy",
-      "kind": "EXCLUSION",
-      "verdict": "UNKNOWN",
-      "reason": "No information on unresolved prior-therapy toxicities."
-     },
-     {
-      "text": "History of a another malignancy within 2 years prior to screening (exception adequately treated cancers).",
-      "kind": "EXCLUSION",
-      "verdict": "MET",
-      "reason": "No other malignancy noted within prior 2 years."
-     }
-    ]
-   }
-  },
-  {
    "type": "thinking",
-   "delta": "The three trials are still near-misses, with most remaining gaps being clinical data the patient can't provide—things like ECOG status, LVEF, and RECIST measurable disease—plus the PIK3CA mutation status. The caregiver might have access to genetic testing reports that could reveal PIK3CA status, which would open up NCT07524322 and resolve a blocker in the HER2-negative trials. I'm weighing whether it's worth asking about PIK3CA.\n\nLet me compute the gaps on all three near-misses to see what's actually blocking them."
-  },
-  {
-   "type": "tool",
-   "name": "computeGap",
-   "detail": "Working out the path to eligibility for NCT05150691"
-  },
-  {
-   "type": "gap",
-   "nctId": "NCT05150691",
-   "path": "You meet the core HER2-positive disease and prior-therapy requirements; eligibility mainly hinges on confirming a series of baseline tests (measurable disease, ECOG, heart function, labs) and ruling out exclusion conditions.\n• Missing test — At least 1 measurable lesion per RECIST 1.1: Obtain CT/MRI imaging documenting at least one measurable target lesion per RECIST 1.1\n• Missing test — LVEF ≥ 50%: Get an ECHO or MUGA scan showing left ventricular ejection fraction of 50% or higher\n• Missing test — ECOG performance status 0-1: Have the site document an ECOG performance status of 0 or 1\n• Missing test — Adequate organ function labs: Complete baseline blood work (hematology, liver, and kidney panels) confirming adequate organ function\n• Missing test — QTcF within limits: Obtain an ECG confirming average QTcF ≤ 470 ms (female threshold)\n• Info needed — Cardiac, lung, infection, HIV/hepatitis, and brain metastasis history: Confirm with the site no symptomatic CHF/arrhythmia, no MI/unstable angina within 6 months, no significant lung disease, no uncontrolled infection, no active hepatitis/HIV, and no clinically active brain metastases\n• Info needed — Unresolved prior-therapy toxicities and other malignancies: Verify any toxicities from prior trastuzumab/paclitaxel have resolved to Grade ≤1 and that there is no second primary malignancy within 3 years"
+   "delta": "I need to calculate the eligibility gaps for three near-miss trials: NCT05150691, NCT07299825, and NCT07524322 with the PIK3CA mutation. The clinical labs like ECOG performance status and left ventricular ejection fraction will need to be verified at the site since the patient won't have those values readily available."
   },
   {
    "type": "tool",
@@ -10951,7 +10824,7 @@
   {
    "type": "gap",
    "nctId": "NCT07299825",
-   "path": "Eligibility hinges on having received a HER2 antibody-drug conjugate with a topoisomerase inhibitor payload (e.g., trastuzumab deruxtecan) as a prior line of therapy, plus documenting disease progression and at least one measurable lesion.\n• Prior therapy — No prior HER2 ADC with topoisomerase inhibitor payload: Trial requires at least one prior line including a HER2 ADC carrying a topoisomerase inhibitor payload (e.g., trastuzumab deruxtecan/T-DXd); your trastuzumab and paclitaxel do not count. If your care team has used or plans such an ADC, confirm it is documented in your treatment history — within the 5-line limit.\n• Info needed — Disease progression or intolerance on most recent therapy not documented: Confirm and document that you progressed or were intolerant during/after your most recent treatment prior to randomization.\n• Missing test — Measurable lesion per RECIST 1.1 not documented: Obtain imaging (CT/MRI) to confirm at least one measurable lesion per RECIST 1.1.\n• Info needed — Reason for stopping trastuzumab unknown: Confirm trastuzumab was not permanently discontinued due to toxicity, which would be exclusionary.\n• Info needed — CNS/eye/hypersensitivity history unknown: Document absence of active CNS metastases or spinal cord compression, severe corneal epithelial disease, and severe monoclonal-antibody hypersensitivity."
+   "path": "You're a strong fit for this HER2-positive breast cancer trial, but it requires prior treatment with a HER2 antibody-drug conjugate carrying a topoisomerase-inhibitor payload (such as trastuzumab deruxtecan), which isn't in your recorded history — plus a few details the site needs to confirm.\n• Prior therapy — Requires prior HER2 ADC with topoisomerase-inhibitor payload: Trial expects at least one prior line in the metastatic setting to be a HER2 ADC such as trastuzumab deruxtecan (T-DXd); your record shows only trastuzumab and paclitaxel. If your oncologist plans such therapy as a next line, eligibility could change once that treatment is on your history. Confirm your full treatment history with the site in case a HER2 ADC was given but not recorded.\n• Info needed — Disease progression or intolerance on most recent therapy: Confirm with the site whether your disease progressed or you were intolerant during/after your last treatment — this is required for randomization.\n• Missing test — At least one measurable RECIST 1.1 lesion: Provide recent imaging (CT/MRI) documenting at least one measurable lesion per RECIST 1.1.\n• Info needed — Reason trastuzumab was discontinued: Confirm trastuzumab was not permanently stopped due to toxicity, which would exclude you."
   },
   {
    "type": "tool",
@@ -10961,19 +10834,25 @@
   {
    "type": "gap",
    "nctId": "NCT07524322",
-   "path": "You could qualify for the Phase 1 dose-escalation cohort if a tumor test confirms a PIK3CA mutation and your disease/labs meet the trial's requirements — but the HR+/HER2- breast expansion cohort is closed to you because you are HER2-positive.\n• Missing test — Documented PIK3CA activating mutation: Get PIK3CA mutation testing on tumor tissue and/or blood (liquid biopsy); a documented activating PIK3CA mutation would open the Phase 1 dose-escalation cohort.\n• Different cohort — HER2 status excludes you from the breast expansion cohort: The Phase 1b expansion cohort requires HR+/HER2-negative breast cancer and you are HER2-positive; instead target the Phase 1 dose-escalation cohort, which accepts any PIK3CA-mutated advanced solid tumor.\n• Info needed — Metastatic/locally advanced unresectable status with progression on prior therapy: Confirm your disease is metastatic or locally advanced/unresectable and has progressed on or after at least one prior therapy (e.g., your trastuzumab/paclitaxel).\n• Missing test — Measurable or evaluable disease per RECIST v1.1: Obtain imaging confirming at least one measurable lesion or evaluable disease per RECIST v1.1.\n• Info needed — ECOG performance status and adequate organ function: Confirm ECOG status is 0 or 1 and provide organ-function labs meeting trial thresholds.\n• Timing / washout — Washout from prior anticancer therapy: Confirm timing of your last trastuzumab/paclitaxel dose relative to the protocol-defined washout window; eligibility opens once that washout period has elapsed.\n• Info needed — Unresolved prior-therapy toxicities and diabetes status: Confirm any prior-therapy toxicities have resolved and that you do not have diabetes requiring anti-hyperglycemic medication."
+   "path": "You could fit the Phase 1 dose-escalation arm (open to any advanced solid tumor) if PIK3CA mutation testing comes back positive and your disease is confirmed metastatic/unresectable with measurable disease.\n• Missing test — Documented activating PIK3CA mutation: Obtain PIK3CA mutation testing on tumor tissue and/or blood (ctDNA); a documented activating PIK3CA mutation is the pivotal requirement that would open the Phase 1 dose-escalation arm.\n• Info needed — Metastatic/unresectable disease that progressed on prior therapy: Confirm disease is locally advanced/unresectable or metastatic and has progressed on or after at least one prior therapy (you have had trastuzumab and paclitaxel).\n• Missing test — Measurable/evaluable disease per RECIST v1.1: Confirm at least one measurable or evaluable lesion on imaging per RECIST v1.1.\n• Info needed — ECOG performance status and adequate organ function: Document ECOG 0 or 1 and obtain organ-function labs meeting protocol thresholds.\n• Timing / washout — Anticancer therapy washout: Confirm the date of your last dose of trastuzumab/paclitaxel or any other anticancer therapy; the protocol-defined washout must be complete before starting study treatment, and any prior-therapy toxicities should have resolved."
+  },
+  {
+   "type": "tool",
+   "name": "computeGap",
+   "detail": "Working out the path to eligibility for NCT05150691"
+  },
+  {
+   "type": "gap",
+   "nctId": "NCT05150691",
+   "path": "Your HER2-positive breast cancer with prior trastuzumab and taxane is a strong match for the breast cohort of this ADC trial; the gaps are all standard screening tests and history details that a site workup can confirm.\n• Missing test — Measurable RECIST 1.1 lesion: Obtain CT/MRI imaging showing at least one measurable lesion per RECIST 1.1.\n• Missing test — Cardiac function (LVEF ≥ 50%): Get an ECHO or MUGA showing LVEF ≥ 50%.\n• Missing test — ECOG performance status 0-1: Have the site document ECOG PS of 0 or 1.\n• Missing test — Adequate organ function labs: Complete screening bloodwork (hematology, liver, renal) to confirm adequate organ function.\n• Missing test — QTcF within limits: Obtain an ECG confirming average QTcF ≤ 470 ms (female threshold).\n• Info needed — Cardiac, lung, infection, HIV/hepatitis, brain-mets, and hypersensitivity history: Document absence of symptomatic CHF (NYHA II-IV), MI/unstable angina within 6 months, significant lung disease, uncontrolled infection, HIV/AIDS or active hepatitis, active brain metastases, and drug hypersensitivity at screening.\n• Info needed — Unresolved prior-therapy toxicities: Confirm toxicities from prior trastuzumab/paclitaxel have resolved to CTCAE Grade ≤ 1 or baseline.\n• Info needed — Disease staging and life expectancy: Confirm advanced/metastatic staging and life expectancy ≥ 3 months, and document signed informed consent at the site.\n• Info needed — Other primary malignancies within 3 years (Part 2): Confirm no second primary malignancy within 3 years other than the allowed exceptions."
   },
   {
    "type": "thinking",
-   "delta": "Now I'll wrap this up with a thoughtful conclusion."
-  },
-  {
-   "type": "narration",
-   "delta": "I've reviewed the most promising trials for Maria. Here's the summary:"
+   "delta": "I'll wrap this up with a thoughtful closing that leaves things on a positive note."
   },
   {
    "type": "final",
-   "message": "Hi — here's what I found for Maria (54, San Diego, HER2-positive / ER-positive metastatic breast cancer, prior trastuzumab + paclitaxel, no brain metastases).\n\n**Most promising — worth contacting first**\n• **DB-1303/BNT323 trial (NCT05150691)** — a HER2-targeted \"antibody-drug conjugate\" study with a site right in your area (≈0 km). Maria's HER2-positive disease and prior trastuzumab/paclitaxel fit the target population well. The only things left are standard screening tests the site performs: a scan confirming a measurable tumor, a heart scan (LVEF ≥50%), an ECG, bloodwork, and an ECOG fitness check. This is the strongest fit and the closest location — a good first call.\n\n**Possible with an extra step**\n• **RGT-490 trial (NCT07524322)** — open to any advanced solid tumor with a *PIK3CA mutation* (nearest site ≈179 km). The single thing that decides this is whether Maria's tumor carries a PIK3CA mutation, which a tumor or blood (liquid biopsy) test can confirm. Her team can also confirm timing since her last paclitaxel (about 2 weeks ago) meets the trial's washout window. Worth asking her oncologist whether she's had PIK3CA testing.\n• **A166 trial (NCT07299825)** — for HER2-positive disease, but it requires a prior HER2 antibody-drug conjugate with a specific payload (like trastuzumab deruxtecan / T-DXd) as an earlier line of therapy. Maria hasn't had that yet, so she'd only fit if/when her care team uses such a drug. One to keep in mind for the future rather than now.\n\n**Not a fit**\n• Two HR+/HER2-*negative* trials (NCT06247995, NCT07368998) don't match because Maria is HER2-*positive*.\n\n**Suggested next steps**\n1. Contact the DB-1303 site (NCT05150691) — it's local and the best current match.\n2. Ask Maria's oncologist whether her tumor has had PIK3CA mutation testing, which would clarify the RGT-490 option.\n3. Bring her recent scans, heart function results, and lab work to screening visits, as those resolve most of the remaining open items.\n\nA quick reminder: this is informational only and not medical advice — please don't change any of Maria's treatment based on this. The trial sites do the final eligibility check and your oncologist is the right person to discuss timing and testing."
+   "message": "Here's where things stand for Maria (54, San Diego, HER2-positive / ER-positive, PR-negative metastatic breast cancer, prior trastuzumab + paclitaxel):\n\nSTRONGEST FIT\n• DB-1303/BNT323 ADC study (NCT05150691) — a Phase 1/2a trial in HER2-positive advanced cancers with a site right in San Diego (0 km). Her cancer type and prior treatment match the target population well. The only remaining items are standard screening tests the site does for everyone: recent imaging showing a measurable lesion, a heart scan (LVEF ≥50%), ECOG performance status, routine bloodwork, and an ECG. Good one to call first.\n\nWORTH EXPLORING (with one specific step)\n• A166 HER2-positive breast cancer study (NCT07299825) — a good match EXCEPT it requires a prior HER2 antibody-drug conjugate such as trastuzumab deruxtecan (T-DXd). Maria's record shows only trastuzumab and paclitaxel. If her oncologist plans a HER2 ADC as a next line, this could open up later — worth raising with her care team, and confirming her full treatment history with the site.\n• RGT-490 study (NCT07524322) — its early-phase arm accepts any advanced solid tumor, but only with a documented PIK3CA mutation. If she hasn't had PIK3CA testing (tumor or blood), asking her oncologist about it could reveal whether this is an option.\n\nNOT A FIT\n• The NeoB/capecitabine study (NCT06247995) and the HR+/HER2-negative trials require HER2-NEGATIVE disease, so they don't fit Maria's HER2-positive cancer.\n\nNEXT STEPS\n1. Contact the DB-1303 site in San Diego — it's the closest and best-matched.\n2. Ask her oncologist about (a) whether a HER2 ADC like T-DXd is a planned next line and (b) PIK3CA mutation testing — either could unlock additional trials.\n3. Note that she just finished paclitaxel ~2 weeks ago and is still on trastuzumab; trial teams will check timing/washout, so share exact dates.\n\nOne important reminder: this is informational only, not medical advice. The trial sites make the final eligibility decision after their own screening, and any treatment changes should be discussed with her care team."
   },
   {
    "type": "done"

@@ -14,10 +14,11 @@ export class SessionRecorder {
       case "thinking":
       case "narration": {
         const last = this.events[this.events.length - 1];
-        if (last && last.type === event.type) {
+        // coalesce only within the same lane (navigator vs a sub-agent)
+        if (last && last.type === event.type && last.agent === event.agent) {
           last.delta += event.delta;
         } else {
-          this.events.push({ type: event.type, delta: event.delta });
+          this.events.push({ type: event.type, delta: event.delta, agent: event.agent });
         }
         return;
       }

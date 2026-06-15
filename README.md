@@ -42,8 +42,7 @@ There are two ways to see it work:
 
 - **Replay mode** — re-emits a recorded session through the identical UI and
   event stream, at $0 and with no key. Requires at least one recording in
-  `public/sessions/`; the committed manifest starts empty. See "Recording &
-  replaying sessions" below to create one.
+  `public/sessions/` (create one with `npm run record` — see below).
 
 ClinicalTrials.gov needs **no key** either way (free, open API).
 
@@ -53,34 +52,50 @@ ClinicalTrials.gov needs **no key** either way (free, open API).
 UI (chat | live reasoning trace | bucketed results)
         ▲  same AgentEvent stream either way
 ┌───────┴────────┐
-│ LiveRunner     │ → /api/agent (SSE) → controller loop (real Claude + CT.gov)
+│ LiveRunner     │ → /api/agent (SSE) → navigator loop (real Claude + CT.gov)
 │ ReplayRunner   │ → committed session JSON, re-emitted with pacing ($0, no key)
 └────────────────┘
 ```
 
-The **controller loop** ([lib/agent/controller.ts](lib/agent/controller.ts)) is
-a custom loop using the Anthropic SDK's native tool use — no agent framework like LangGraph or CrewAI. Each turn, the model chooses exactly one tool; the loop dispatches it, records the
-observation into state, and repeats:
+It's a **two-agent system** — both are custom loops on the Anthropic SDK's
+native tool use, with no agent framework (no LangGraph / CrewAI):
+
+- **Navigator** ([lib/agent/controller.ts](lib/agent/controller.ts)) — owns the
+  whole session (breadth). Each turn the model picks one tool; the loop
+  dispatches it, records the observation into state, and repeats.
+- **Eligibility-analyst** ([lib/agent/eligibilityAnalyst.ts](lib/agent/eligibilityAnalyst.ts))
+  — a sub-agent the navigator spawns to judge **one** trial (depth). It runs
+  its own short tool-use loop in isolated context (just that trial + the
+  patient), pulls the full protocol narrative when the bullet criteria are
+  ambiguous, and returns a criterion-by-criterion verdict. Its reasoning
+  renders as a nested lane in the live trace.
+
+The **navigator's** tools:
 
 | Tool | What it does |
 |---|---|
-| `askPatient` | Surfaces the **highest-information-gain** question to the UI and pauses the run (the server is stateless — a serialized continuation round-trips through the client) |
-| `searchTrials` | Queries CT.gov v2; code pre-filters (sex, age, geo distance) drop obvious mismatches before any LLM spend |
-| `evaluateTrial` | LLM reasons criterion-by-criterion → MET / NOT_MET / UNKNOWN with reasons, via structured outputs |
+| `askPatient` | Surfaces the **highest-information-gain** question and pauses the run (stateless server — a serialized continuation round-trips through the client) |
+| `searchTrials` | Queries CT.gov v2; code pre-filters (sex, age, geo distance) drop obvious mismatches before any LLM spend; candidates **accumulate and dedupe** across searches |
+| `evaluateTrial` | Hands one trial to the **eligibility-analyst sub-agent**, which returns a per-criterion MET / NOT_MET / UNKNOWN verdict |
+| `reviewUnknowns` | Aggregates UNKNOWN criteria across the in-play trials so the navigator can ask the one post-search question that resolves the most (info-gain, grounded in real trials) |
 | `computeGap` | Counterfactual reasoning on a near miss → the concrete path to eligibility |
 | `finish` | Final plain-language wrap-up |
 
-Four files explain the whole agent:
+The **eligibility-analyst's** tools: `getTrialDetail` (pull the full protocol
+narrative on demand) and `finalizeVerdict` (submit the structured verdict).
+
+Files that explain the whole thing:
 
 1. **State** — [lib/types.ts](lib/types.ts) (`AgentState`: profile, unknowns, candidates, verdicts, nearMissPaths)
-2. **Controller loop** — [lib/agent/controller.ts](lib/agent/controller.ts) (the model decides; the loop dispatches)
-3. **One reasoning step** — [lib/agent/evaluateTrial.ts](lib/agent/evaluateTrial.ts) (criteria split → structured verdicts)
+2. **Navigator loop** — [lib/agent/controller.ts](lib/agent/controller.ts) (the model decides; the loop dispatches)
+3. **Sub-agent** — [lib/agent/eligibilityAnalyst.ts](lib/agent/eligibilityAnalyst.ts) (its own loop: fetch detail → reason → finalize verdict)
 4. **The Runner seam** — [lib/runner/live.ts](lib/runner/live.ts) vs [lib/runner/replay.ts](lib/runner/replay.ts) (same event stream, so the UI can't tell live from replay)
 
 `/api/agent` is the only route the UI calls. `/api/trials`, `/api/evaluate`,
-and `/api/gap` are standalone routes left over from earlier build slices —
-useful for poking at one piece in isolation (e.g. `evaluateTrial` on a single
-trial via curl) without running the full agent loop.
+and `/api/gap` are standalone routes left from earlier build slices — handy for
+poking at one piece in isolation via curl. (`/api/evaluate` still uses the
+one-shot [lib/agent/evaluateTrial.ts](lib/agent/evaluateTrial.ts); the navigator
+path uses the sub-agent instead.)
 
 ## Recording & replaying sessions
 
@@ -93,11 +108,10 @@ npm run record -- --scenario=james   # the other scripted persona
 npm run record                       # interactive — you type the patient side
 ```
 
-Each run needs `ANTHROPIC_API_KEY` set (it drives the real controller loop).
-Recordings land in `public/sessions/` and register themselves in
+Each run needs `ANTHROPIC_API_KEY` set (it drives the real navigator +
+analyst loop). Recordings land in `public/sessions/` and register themselves in
 `public/sessions/index.json`; commit them and they appear under "Watch a
-recorded session" in the UI. That manifest is currently empty — no sessions
-have been recorded yet.
+recorded session" in the UI.
 
 ## Deploying
 

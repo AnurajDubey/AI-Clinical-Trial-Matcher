@@ -49,6 +49,31 @@ export async function getTrial(nctId: string): Promise<Trial | null> {
   return toTrial(await res.json());
 }
 
+export interface TrialNarrative {
+  briefSummary?: string;
+  detailedDescription?: string;
+}
+
+// The prose modules the trimmed `Trial` omits — protocol summary and the full
+// detailed description, where cohort splits and prior-therapy lines often live.
+// The eligibility-analyst pulls this on demand when the bullet criteria are
+// ambiguous.
+export async function fetchTrialNarrative(nctId: string): Promise<TrialNarrative | null> {
+  const res = await fetch(`${CTGOV_BASE}/studies/${encodeURIComponent(nctId)}?format=json`);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`ClinicalTrials.gov detail failed: HTTP ${res.status}`);
+  }
+  const data: unknown = await res.json();
+  const proto = isRecord(data) ? data.protocolSection : undefined;
+  const desc = isRecord(proto) ? proto.descriptionModule : undefined;
+  if (!isRecord(desc)) return {};
+  return {
+    briefSummary: stringOrUndefined(desc.briefSummary),
+    detailedDescription: stringOrUndefined(desc.detailedDescription),
+  };
+}
+
 // CT.gov ages are unit-strings like "18 Years", "6 Months" — convert to years.
 export function parseAgeYears(age: unknown): number | undefined {
   if (typeof age !== "string") return undefined;

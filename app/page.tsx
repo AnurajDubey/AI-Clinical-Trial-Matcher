@@ -47,15 +47,16 @@ export default function Home() {
     void fetchSessionManifest().then(setSessions);
   }, []);
 
-  function appendTrace(kind: TraceItem["kind"], text: string) {
+  function appendTrace(kind: TraceItem["kind"], text: string, scope?: TraceItem["scope"]) {
     setTrace((prev) => {
-      // streaming deltas accumulate into the trailing item of the same kind
-      if (kind !== "tool" && prev.length > 0 && prev[prev.length - 1].kind === kind) {
+      // streaming deltas accumulate into the trailing item of the same kind+scope
+      const last = prev[prev.length - 1];
+      if ((kind === "thinking" || kind === "narration") && last && last.kind === kind && last.scope === scope) {
         const next = [...prev];
-        next[next.length - 1] = { kind, text: next[next.length - 1].text + text };
+        next[next.length - 1] = { ...last, text: last.text + text };
         return next;
       }
-      return [...prev, { kind, text }];
+      return [...prev, { kind, text, scope }];
     });
   }
 
@@ -84,13 +85,13 @@ export default function Home() {
         setMode("running");
         break;
       case "thinking":
-        appendTrace("thinking", event.delta);
+        appendTrace("thinking", event.delta, event.agent === "analyst" ? "analyst" : undefined);
         break;
       case "narration":
-        appendTrace("narration", event.delta);
+        appendTrace("narration", event.delta, event.agent === "analyst" ? "analyst" : undefined);
         break;
       case "tool":
-        appendTrace("tool", event.detail);
+        appendTrace("tool", event.detail, event.agent === "analyst" ? "analyst" : undefined);
         break;
       case "profile":
         setProfile(event.profile);
@@ -116,6 +117,12 @@ export default function Home() {
       }
       case "evaluating":
         mutateResults((r) => r.pendingIds.add(event.nctId));
+        break;
+      case "analystStart":
+        appendTrace("agent", `Eligibility analyst · ${event.nctId} — ${event.title.slice(0, 60)}`);
+        break;
+      case "analystEnd":
+        appendTrace("tool", `verdict → ${event.status}`, "analyst");
         break;
       case "verdict":
         mutateResults((r) => {
