@@ -5,6 +5,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { getAnthropic, MODEL } from "@/lib/anthropic";
 import { AGENT_TOOLS, MAX_EVALUATIONS_PER_RUN, dispatchTool } from "./tools";
+import { withCache, logCacheUsage } from "./cache";
 import type { AgentEvent } from "./events";
 import type { AgentState } from "@/lib/types";
 
@@ -39,13 +40,14 @@ export async function runAgentLoop({ messages, state, emit }: LoopHandles): Prom
   let nudges = 0;
 
   for (let turn = 0; turn < MAX_TURNS && !state.done; turn++) {
+    const cached = withCache(SYSTEM_PROMPT, AGENT_TOOLS, messages);
     const stream = client.messages.stream({
       model: MODEL,
       max_tokens: 16000,
       thinking: { type: "adaptive", display: "summarized" },
-      system: SYSTEM_PROMPT,
-      tools: AGENT_TOOLS,
-      messages,
+      system: cached.system,
+      tools: cached.tools,
+      messages: cached.messages,
     });
 
     for await (const event of stream) {
@@ -58,6 +60,7 @@ export async function runAgentLoop({ messages, state, emit }: LoopHandles): Prom
       }
     }
     const message = await stream.finalMessage();
+    logCacheUsage("navigator", message.usage);
 
     // Echo the full content (thinking blocks included) back on the next turn.
     messages.push({ role: "assistant", content: message.content });

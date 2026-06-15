@@ -7,6 +7,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { getAnthropic, MODEL } from "@/lib/anthropic";
+import { withCache, logCacheUsage } from "./cache";
 import { splitEligibilityCriteria } from "@/lib/criteria";
 import { fetchTrialNarrative } from "@/lib/ctgov";
 import type { AgentEvent } from "./events";
@@ -147,13 +148,14 @@ Assess this trial. Pull the full detail only if the criteria are ambiguous, then
   let detailFetched = false;
 
   for (let turn = 0; turn < MAX_ANALYST_TURNS && !verdict; turn++) {
+    const cached = withCache(SYSTEM_PROMPT, ANALYST_TOOLS, messages);
     const stream = client.messages.stream({
       model: MODEL,
       max_tokens: 8000,
       thinking: { type: "adaptive", display: "summarized" },
-      system: SYSTEM_PROMPT,
-      tools: ANALYST_TOOLS,
-      messages,
+      system: cached.system,
+      tools: cached.tools,
+      messages: cached.messages,
     });
     for await (const event of stream) {
       if (event.type === "content_block_delta") {
@@ -165,6 +167,7 @@ Assess this trial. Pull the full detail only if the criteria are ambiguous, then
       }
     }
     const message = await stream.finalMessage();
+    logCacheUsage("analyst", message.usage);
     messages.push({ role: "assistant", content: message.content });
 
     const toolUses = message.content.filter(
