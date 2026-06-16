@@ -1,4 +1,4 @@
-// Core domain types for the Clinical Trial Navigator.
+// Core domain types for TrialScouter AI.
 
 export type Verdict = "MET" | "NOT_MET" | "UNKNOWN";
 

@@ -1,4 +1,4 @@
-# Clinical Trial Navigator
+# TrialScouter AI
 
 ## Purpose
 

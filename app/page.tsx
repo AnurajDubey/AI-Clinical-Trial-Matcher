@@ -201,7 +201,7 @@ export default function Home() {
       <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4 px-6 py-3.5">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-emerald-600 text-white shadow-glow">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-emerald-600 text-white shadow-glow">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -209,15 +209,19 @@ export default function Home() {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-5 w-5"
+                className="h-6 w-6"
               >
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88" fill="currentColor" stroke="none" />
+                {/* magnifying glass */}
+                <circle cx="11" cy="11" r="7.5" />
+                <path d="m21 21-4.35-4.35" />
+                {/* medical cross inside the lens */}
+                <path d="M11 8v6" />
+                <path d="M8 11h6" />
               </svg>
             </span>
             <div className="leading-tight">
-              <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-                Clinical Trial Navigator
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+                TrialScouter AI
               </h1>
               <p className="hidden text-sm text-slate-500 sm:block">
                 An agent that reasons about eligibility — not a search box.

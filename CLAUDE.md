@@ -1,4 +1,4 @@
-# CLAUDE.md — Clinical Trial Navigator
+# CLAUDE.md — TrialScouter AI
 
 > **What this file is.** The build spec and standing context for this project.
 > Use it two ways: (1) paste its contents as the kickoff prompt for Fable to
