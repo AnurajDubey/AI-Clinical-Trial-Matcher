@@ -30,21 +30,28 @@ npm install
 npm run dev                        # http://localhost:3000
 ```
 
-There are two ways to see it work:
+The UI **auto-detects** whether an Anthropic key is configured (one boolean
+from `/api/status` — the key itself never reaches the browser) and adapts:
 
-- **Live mode** — the real chat-driven navigator. Needs an Anthropic key:
-  *every* turn, starting with your first message, calls Claude (to extract
-  the patient profile and to decide the agent's next move).
+- **Deployed demo (no key) → replay only.** With no `ANTHROPIC_API_KEY` set,
+  the app serves the key-less public experience: the live chat input is
+  replaced by a short notice, and visitors explore by replaying the committed
+  **recorded sessions** ("Try a demo") — deterministic, free, nothing to abuse.
+  This is the model for the public site.
+
+- **Live mode (your own key) → real chat.** Add a key and the free-text chat
+  turns on: *every* turn, starting with your first message, calls Claude (to
+  extract the patient profile and decide the navigator's next move).
 
   ```bash
   cp .env.local.example .env.local   # add your ANTHROPIC_API_KEY
   ```
 
-- **Replay mode** — re-emits a recorded session through the identical UI and
-  event stream, at $0 and with no key. Requires at least one recording in
-  `public/sessions/` (create one with `npm run record` — see below).
+So the hosted site is a **replay demo**; running it for real — chatting with
+your own scenarios — means **forking the repo and adding your own key**. The
+recorded sessions stay available either way.
 
-ClinicalTrials.gov needs **no key** either way (free, open API).
+ClinicalTrials.gov needs **no key** in either mode (free, open API).
 
 ## How it works
 

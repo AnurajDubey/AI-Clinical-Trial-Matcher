@@ -12,15 +12,19 @@ export function ReplayPicker({
   if (sessions.length === 0) return null;
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-card">
-      <h2 className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-teal-500">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-        Watch a recorded session
-      </h2>
-      <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-        Real sessions, replayed deterministically — no API calls, no key needed.
-      </p>
+      <div className="flex items-center gap-2.5">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-glow">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+        <div className="leading-tight">
+          <h2 className="text-sm font-semibold text-slate-900">Try a demo</h2>
+          <p className="text-[11px] text-slate-400">
+            Recorded sessions, replayed — deterministic, no API key needed.
+          </p>
+        </div>
+      </div>
       <ul className="mt-3 space-y-2">
         {sessions.map((s) => (
           <li key={s.file}>

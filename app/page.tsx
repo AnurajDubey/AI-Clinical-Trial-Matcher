@@ -40,11 +40,18 @@ export default function Home() {
   const [distanceLabels, setDistanceLabels] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<SessionManifestEntry[]>([]);
+  // Whether a server-side key is configured. Default false so the key-less
+  // public demo never offers a live input that would fail on send.
+  const [liveEnabled, setLiveEnabled] = useState(false);
   const liveRef = useRef<LiveRunner | null>(null);
   const replayRef = useRef<ReplayHandle | null>(null);
 
   useEffect(() => {
     void fetchSessionManifest().then(setSessions);
+    void fetch("/api/status")
+      .then((r) => (r.ok ? r.json() : { liveEnabled: false }))
+      .then((d) => setLiveEnabled(Boolean(d?.liveEnabled)))
+      .catch(() => setLiveEnabled(false));
   }, []);
 
   function appendTrace(kind: TraceItem["kind"], text: string, scope?: TraceItem["scope"]) {
@@ -194,7 +201,7 @@ export default function Home() {
     setError(null);
   }
 
-  const canSend = !replaying && (mode === "start" || mode === "awaiting");
+  const canSend = liveEnabled && !replaying && (mode === "start" || mode === "awaiting");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -320,11 +327,12 @@ export default function Home() {
               onSend={send}
               canSend={canSend}
               running={mode === "running" && !replaying}
+              liveEnabled={liveEnabled}
             />
-            <ProfileCard profile={profile} unknowns={unknowns} />
             {mode === "start" && (
               <ReplayPicker sessions={sessions} onPlay={playSession} disabled={false} />
             )}
+            <ProfileCard profile={profile} unknowns={unknowns} />
           </div>
         </div>
       </main>
